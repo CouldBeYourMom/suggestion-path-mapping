@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import zipfile
+import sys
 from datetime import datetime
 
 # ___ CONFIGURATION ___
@@ -75,3 +76,4 @@ def backup_database():
 
 if __name__ == "__main__":
     backup_database()
+    sys.exit()
