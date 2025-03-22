@@ -1,0 +1,51 @@
+# Ignore API keys, environment variables, or secret files
+.env
+config.json
+
+# Ignore database files (sensitive data)
+data/*.db
+
+# Ignore database backups
+backups/
+
+# Ignore archived/old scripts
+archive/
+
+# Ignore compiled C++ files & build artifacts
+cpp/*.o
+cpp/*.out
+cpp/*.exe
+cpp/*.a
+cpp/*.lib
+
+# Ignore Python cache & virtual environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+
+# Ignore logs, temp files, and dataset outputs
+*.log
+*.tmp
+*.bak
+
+# Ignore IDE/editor settings (VSCode, JetBrains, etc.)
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore generated files (e.g., visualization outputs)
+visualization/
+
+# Keep directory but ignore all contents (except .gitkeep)
+backups/*
+!backups/.gitkeep
+
+archive/*
+!archive/.gitkeep
+
+visualization/*
+!visualization/.gitkeep

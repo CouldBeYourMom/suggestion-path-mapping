@@ -1,0 +1,14 @@
+  {
+  "profanity": ["fuck", "shit", "bitch", "damn", "bastard", "asshole", "ass", "arse", "dick", "pussy", "cunt", "slut", "whore", "skank", "twat", "douche"],
+  "profanity_variations": ["f***", "fuk", "sh!t", "b!tch", "biatch", "beatch", "d@mn", "a$$", "c*nt", "d1ck", "d0uche"],
+  "sexual_content": ["sex", "porn", "nude", "xxx", "xrated", "strip", "orgy", "blowjob", "deepthroat", "threesome", "tit", "cum", "jizz", "dildo", "buttplug", "anal", "cock", "ejaculate", "erotic", "gangbang", "jack off", "jerk off", "masterbate", "hard-on", "wank", "kink", "fetish", "doggy style", "double penetration", "dp", "hump", "fingerbang", "fisting", "g-spot", "threesome", "incest", "lap dance", "prostitute", "strap on", "voyuer"],
+  "sexual_variations": ["s3x", "pr0n", "n00d", "xXx", "0rgy", "bl0wjob", "3some"],
+  "violence": ["murder", "assassinate", "blood", "suicide", "self-harm", "decapitate", "rape", "molest", "lynch", "torture", "mutilate"],
+  "violent_variations": ["murd3r", "k1ll", "5tab", "5hoot", "s!icide", "kys"],
+  "drugs": ["weed", "cocaine", "meth", "heroin", "opioids", "ecstasy", "lsd", "shrooms", "fentanyl", "ketamine", "mdma", "steroids", "pcp", "marijuana", "cannabis", "viagra"],
+  "drug_variations": ["w33d", "c0ke", "m3th", "h3r0in"],
+  "hate_speech": ["nigger", "nigga", "fag", "faggot", "tranny", "retard", "gook", "chink", "spic", "kike", "dyke", "coon", "beaner", "paki", "darky", "nignog", "chinaman", "shemale", "cripple", "diaper head", "towel head", "zipperhead", "raghead", "dothead", "wetback", "jigaboo", "porch monkey", "lesbo", "nignog", "negroid", "redskin", "schizo", "white power"],
+  "hate_variations": ["n***a", "f@g", "tr@nn¥", "r3t@rd"],
+  "internet_slang": ["nsfw", "sugar daddy", "camgirl", "onlyfans", "feet pics", "r34", "cameltoe", "choad", "circlejerk", "milf", "jailbait", "nympho", "perv", "gtfo", "stfu", "cp", "poon", "queef", "schlong", "smut", "teabag"],
+  "misc": ["fuckboy", "simp", "sissy", "soyboy", "cuck", "thot", "degenerate", "pedophile", "pedo", "beastiality", "bimbo", "goatse", "necrophilia", "bdsm", "deepfake", "enema", "gigolo", "hamas", "isis", "kkk", "lolita", "nazi"]
+  }
