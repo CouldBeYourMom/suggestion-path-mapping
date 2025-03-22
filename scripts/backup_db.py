@@ -4,7 +4,7 @@ import zipfile
 from datetime import datetime
 
 # ___ CONFIGURATION ___
-MAX_BACKUPS = 10               # Set to None to keep everything
+MAX_BACKUPS = 100              # Set to None to keep everything
 COMPRESS_BACKUPS = True        # Set to False to skip .zip
 LOG_BACKUPS = True             # Set to False to skip logging
 BACKUP_FILENAME_PREFIX = "youtube_data_backup"
@@ -32,7 +32,7 @@ def rotate_backups():
         to_delete = backups.pop(0)
         os.remove(os.path.join(BACKUP_DIR, to_delete))
         if LOG_BACKUPS:
-            log_entry(f"🗑️ Deleted old backup: {to_delete}")
+            log_entry(f"Deleted old backup: {to_delete}")
 
 def log_entry(message):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -45,18 +45,18 @@ def backup_database():
     raw_backup_filename = f"{BACKUP_FILENAME_PREFIX}_{timestamp}.db"
     raw_backup_path = os.path.join(BACKUP_DIR, raw_backup_filename)
 
-    print("📁 Looking for DB at:", DB_PATH)
+    print("Looking for DB at:", DB_PATH)
     try:
         conn = sqlite3.connect(DB_PATH)
         backup_conn = sqlite3.connect(raw_backup_path)
         conn.backup(backup_conn)
         backup_conn.close()
         conn.close()
-        print(f"✅ Raw backup created: {raw_backup_filename}")
+        print(f"Raw backup created: {raw_backup_filename}")
         if LOG_BACKUPS:
-            log_entry(f"✅ Raw backup created: {raw_backup_filename}")
+            log_entry(f"Raw backup created: {raw_backup_filename}")
     except Exception as e:
-        error_msg = f"❌ Backup failed: {e}"
+        error_msg = f"Backup failed: {e}"
         print(error_msg)
         if LOG_BACKUPS:
             log_entry(error_msg)
@@ -67,9 +67,9 @@ def backup_database():
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             zipf.write(raw_backup_path, arcname=os.path.basename(raw_backup_path))
         os.remove(raw_backup_path)
-        print(f"📦 Compressed to ZIP: {os.path.basename(zip_path)}")
+        print(f"Compressed to ZIP: {os.path.basename(zip_path)}")
         if LOG_BACKUPS:
-            log_entry(f"📦 Compressed to ZIP: {os.path.basename(zip_path)}")
+            log_entry(f"Compressed to ZIP: {os.path.basename(zip_path)}")
 
     rotate_backups()
 
