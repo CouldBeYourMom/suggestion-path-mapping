@@ -1,4 +1,4 @@
-# 📺 YouTube Graph Analysis
+# 📺 Suggestion Path Mapping
 
 ## 🎯 Project Overview
 

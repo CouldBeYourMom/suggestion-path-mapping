@@ -1,0 +1,15 @@
+# Shared core files — update once GitHub usernames are known
+/cpp/main.cpp           @TeammateA @TeammateB @TeammateC
+/cpp/graph.cpp          @TeammateA @TeammateB @TeammateC
+/cpp/graph.h            @TeammateA @TeammateB @TeammateC
+
+# Algorithm-specific ownership
+/cpp/search_astar.*     @TeammateA
+/cpp/search_dijkstra.*  @TeammateB
+/cpp/search_random_walk.* @TeammateC
+
+# Docs and config — owner only
+/README.md              @CouldBeYourMom
+/docs/                  @CouldBeYourMom
+/scripts/               @CouldBeYourMom
+/data/                  @CouldBeYourMom
