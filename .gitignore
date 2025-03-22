@@ -4,6 +4,8 @@ config.json
 
 # Ignore database files (sensitive data)
 data/*.db
+data/inserted_video_relations.txt
+data/playlist_video_ids.txt
 
 # Ignore database backups
 backups/
