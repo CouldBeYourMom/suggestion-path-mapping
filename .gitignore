@@ -18,6 +18,7 @@ cpp/*.out
 cpp/*.exe
 cpp/*.a
 cpp/*.lib
+bin/
 
 # Ignore Python cache & virtual environments
 __pycache__/
@@ -31,6 +32,7 @@ venv/
 *.log
 *.tmp
 *.bak
+compile_log.txt
 
 # Ignore IDE/editor settings (VSCode, JetBrains, etc.)
 .vscode/

@@ -1,36 +1,31 @@
 #include "graph.h"
-#include "search_dijkstra.h"
-#include "search_astar.h"
-#include "search_random_walk.h"
 #include <iostream>
+#include <sqlite3.h>
+
 
 int main() {
-    Graph graph;
-    graph.loadGraphFromDB("youtube_graph.db");  // Replace with your actual database path
-    
-    std::cout << "Graph Structure:\n";
-    graph.printGraph();
+    Graph g;
 
-    std::cout << "\nDijkstra's Shortest Path from A to D:\n";
-    auto dijkstraResult = SearchDijkstra::dijkstra(graph, "A", "D");
-    for (const auto& node : dijkstraResult) {
-        std::cout << node << " ";
-    }
-    std::cout << "\n";
+    // 📥 Load the graph from the SQLite database
+    g.loadGraphFromDB("data/youtube_data.db");
 
-    std::cout << "\nA* Search Path from A to D:\n";
-    auto astarResult = SearchAStar::astar(graph, "A", "D");
-    for (const auto& node : astarResult) {
-        std::cout << node << " ";
-    }
-    std::cout << "\n";
+    // 🧪 Run a BFS traversal from a selected starting node
+    // Replace this ID with a real one from your DB when testing
+    std::string startNode = "ORIGINAL";
+    g.bfs(startNode);
 
-    std::cout << "\nRandom Walk from A (5 steps):\n";
-    auto randomWalkResult = SearchRandomWalk::randomWalk(graph, "A", 5);
-    for (const auto& node : randomWalkResult) {
-        std::cout << node << " ";
-    }
-    std::cout << "\n";
+    // ---------------------------------------------
+    // 🧑‍💻 Teammate References: Keep these here for testing
+    //
+    // Run Dijkstra's algorithm (teammate 1)
+    // runDijkstra(g, "VIDEO_ID_START", "VIDEO_ID_END");
+    //
+    // Run A* Search (teammate 2)
+    // runAStar(g, "VIDEO_ID_START", "VIDEO_ID_END");
+    //
+    // Run Random Walk (teammate 3)
+    // runRandomWalk(g, "VIDEO_ID_START");
+    // ---------------------------------------------
 
     return 0;
 }
