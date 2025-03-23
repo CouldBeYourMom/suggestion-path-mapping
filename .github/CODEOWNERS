@@ -1,10 +1,10 @@
 # Shared core files — update once GitHub usernames are known
-/cpp/main.cpp           @Y-Berhie @TeammateB @TeammateC
-/cpp/graph.cpp          @Y-Berhie @TeammateB @TeammateC
-/cpp/graph.h            @Y-Berhie @TeammateB @TeammateC
+/cpp/main.cpp           @Y-Berhie @kevinyuQ @TeammateC
+/cpp/graph.cpp          @Y-Berhie @kevinyuQ @TeammateC
+/cpp/graph.h            @Y-Berhie @kevinyuQ @TeammateC
 
 # Algorithm-specific ownership
-/cpp/search_astar.*     @TeammateA
+/cpp/search_astar.*     @kevinyuQ
 /cpp/search_dijkstra.*  @Y-Berhie
 /cpp/search_random_walk.* @TeammateC
 
