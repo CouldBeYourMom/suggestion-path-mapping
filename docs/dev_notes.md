@@ -125,3 +125,27 @@ Things that don’t fit neatly elsewhere, random ideas, things to revisit:
 
 ---
 
+# ✅ Dev Notes Recap – March 23
+Today was a major cleanup and enhancement milestone:
+
+📥 Massively expanded the dataset by adding curated videos from seed playlists.
+
+🔧 Corrected data entries and established "ORIGINAL" as the universal parent node to allow testing across any seed.
+
+🧪 Created a clean main.cpp test environment with flexible graph traversal calls.
+
+🧱 Enhanced graph.cpp to:
+
+- Display adjacency list with flags + classification.
+- Support classification logic per node.
+- Prepare for future weighted edge and full-node loading strategies.
+
+💻 Implemented .gitignore to manage build artifacts, logs, temp files, and backups.
+
+💾 Manually validated that the automated backup system is reliable, consistent, and low-impact.
+
+📌 Planning to:
+
+- Rename loadGraphFromDB() for parent-focused paths (optionally weight by suggestion rank).
+- Create a new function to ensure every unique video is a node and edges are weighted by views, with bi-directional support for cycles.
+- Use this to support algorithm comparisons and future visualizations.

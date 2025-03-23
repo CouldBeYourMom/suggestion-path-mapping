@@ -1,23 +1,23 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <string>
+#include <utility>
 
 class Graph {
 public:
-    Graph();
-    void addEdge(const std::string& from, const std::string& to, double weight = 1.0);
-    void printGraph() const;
-    
-    // Accessors for algorithms
-    const std::unordered_map<std::string, std::vector<std::pair<std::string, double>>>& getAdjList() const;
-
     void loadGraphFromDB(const std::string& dbPath);
-    
+    void printGraph(sqlite3* db) const;
+    void bfs(const std::string& startNode) const;
+    ~Graph(); // Destructor to ensure cleanup
+
 private:
     std::unordered_map<std::string, std::vector<std::pair<std::string, double>>> adjList;
+    std::unordered_map<std::string, int> flagCounts;
+    int getFlagCount(const std::string& videoId, sqlite3* db) const;
+    std::string getTitle(const std::string& videoId, sqlite3* db) const;
 };
 
 #endif
