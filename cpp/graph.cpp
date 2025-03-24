@@ -4,7 +4,6 @@
 #include <queue>
 #include <unordered_set>
 
-
 /*
 Loads existing graph from database using standard STL containers. 
 Video relationships are stored in the manual_video_links table in the DB.
@@ -77,7 +76,7 @@ void Graph::printGraph(sqlite3* db) const {
    Of Videos
 _______________*/
 
-std::string classifyFlagLevel(int flags) {
+std::string Graph::classifyFlagLevel(int flags) const{
     if (flags == 0) return "🟢 Safe";
     if (flags <= 5) return "🟡 Mild";
     if (flags <= 15) return "🟠 Borderline";
