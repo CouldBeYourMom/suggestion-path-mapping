@@ -1,7 +1,7 @@
 # Shared core files — update once GitHub usernames are known
-/cpp/main.cpp           @Y-Berhie @kevinyuQ @schwartza-afs
-/cpp/graph.cpp          @Y-Berhie @kevinyuQ @schwartza-afs
-/cpp/graph.h            @Y-Berhie @kevinyuQ @schwartza-afs
+/cpp/main.cpp           @CouldBeYourMom @Y-Berhie @kevinyuQ @schwartza-afs
+/cpp/graph.cpp          @CouldBeYourMom @Y-Berhie @kevinyuQ @schwartza-afs
+/cpp/graph.h            @CouldBeYourMom @Y-Berhie @kevinyuQ @schwartza-afs
 
 # Algorithm-specific ownership
 /cpp/search_astar.*     @kevinyuQ
