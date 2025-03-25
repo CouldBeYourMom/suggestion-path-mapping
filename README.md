@@ -69,8 +69,8 @@ These instructions will help you set up the project locally for development and 
 Clone the repository and install required Python packages.
 
 ```bash
-$ git clone https://github.com/YOUR_USERNAME/YouTube-Graph-Analysis.git
-$ cd YouTube-Graph-Analysis
+$ git clone https://github.com/YOUR_USERNAME/suggestion-path-mapping
+$ cd suggestion-path-mapping
 $ cp .env.example .env
 ```
 

@@ -12,7 +12,7 @@ API_KEY = os.getenv("YOUTUBE_API_KEY")
 youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=API_KEY)
 
 # ✅ ENTER PLAYLIST ID HERE BEFORE RUNNING
-PLAYLIST_ID = "PL_Jmhi7OOYAzEat-XW1lIajkyMy9q8b9v"
+PLAYLIST_ID = "UNIQUE PLAYLIST ID"
 
 # Connect to SQLite database
 conn = sqlite3.connect("../data/youtube_data.db")
