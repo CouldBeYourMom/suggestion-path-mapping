@@ -2,35 +2,52 @@
 #include <chrono>
 #include <iostream>
 
+/*
+ * Input: A node in the graph.
+ * Output: The heuristic value for this node.
+ * This function should calculate the heuristic value for a node using the heuristic function.
+ *
+ */
+float SearchAStar::heuristic(const std::string& startNode) {
+    return 0;
+}
 
-// This replaces your old SearchAStar::astar() and gives you the final format for team integration
-std::vector<std::pair<std::string, double>> runAStar(
+std::vector<std::pair<std::string, double>> SearchAStar::runAStar(
     const Graph& g,
     const std::string& startNode,
     int maxNodesToVisit,
     const std::string& weightType
-) { 
+) {
     // Keep these following 3 lines here
     std::vector<std::pair<std::string, double>> visited; // visited : vector of (video_id, time_since_start_in_ms)
     //auto startTime = std::chrono::steady_clock::now(); // Start the clock  ****UNCOMMENT THIS LINE
     //int visitCount = 0;           ****UNCOMMENT THIS LINE
 
+    // TODO: Implement A* Search Algorithm
+    std::vector<std::pair<std::string, double>> result;
+    std::priority_queue<std::string> open;
+    fValues[startNode] = 0;
+    gValues[startNode] = 0;
 
-    /* ========================================================
-        See the dfs() function in graph.cpp for reference
-    
-        Before you start looping through adjacent vectors add the following line
-        std::unordered_set<std::pair<std::string, std::string>, pair_hash> visitedPairs; // Hashmap to keep track of parent-child visits
-    
-        Inside your loop add the following:
-        
-        after you open.pop(), before you find neighbors put the following 3 lines to capture a timestamp and the video ID for the visit of each node
-        auto now = std::chrono::steady_clock::now();
-        double elapsed = std::chrono::duration<double, std::milli>(now - startTime).count();
-        visited.emplace_back(currentNode, elapsed);
 
-     * ======================================================== */
+    //
+    while (!open.empty()) {
+        std::string currentNode = open.top();
+        open.pop();
 
-     return {};       // REMOVE THIS LINE
-    //return visited; // Replace your current return with this   ****UNCOMMENT THIS LINE
+        // Retrieve neighbors of currentNode
+        std::vector<std::string> neighbors; // = getNeighbors(currentNode)
+        // For each neighbor of currentNode.
+        for (auto n : neighbors) {
+            //
+            // Calculate tentative g value for neighbor. g(neighbor) = g(currentNode) + weight(currentNode to neighbor)
+            float tentativeG = gValues[currentNode]; // tentativeG = g(currentNode) + edge weight
+            // if tentative g is less than current g value of neighbor, perform updates.
+            if (tentativeG < gValues[n]) {
+                // Perform updates: update g(neighbor) and f(neighbor). Update parent(neighbor)
+            }
+        }
+    }
+
+    return result;
 }
