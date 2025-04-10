@@ -1,151 +1,133 @@
-# 🛠️ Development Notes & Strategy Log
+# 🛠️ Developer Notes
 
-This document tracks decisions, iterations, and insights made throughout the YouTube Graph Analysis project. It’s part journal, part reference, and part scratchpad for design thinking.
-
----
-
-## 📅 Table of Contents
-
-- [Overview](#overview)
-- [Video Collection Strategy](#video-collection-strategy)
-- [Profanity Dictionary & Flagging System](#profanity-dictionary--flagging-system)
-- [Database Schema Decisions](#database-schema-decisions)
-- [Graph Structure & Algorithms](#graph-structure--algorithms)
-- [Language Model Possibilities](#language-model-possibilities)
-- [Backup & Logging System](#backup--logging-system)
-- [Roadblocks & Pivots](#roadblocks--pivots)
-- [Future Ideas](#future-ideas)
-- [Scratchpad](#scratchpad)
+This document serves as an evolving log of development progress, key decisions, and strategy notes for the YouTube Suggestion Path Mapping project.  
+Sections below reflect major functional areas with short, dated updates to track growth over time.
 
 ---
 
-## 📌 Overview
-
-Originally inspired by concerns about how kids might encounter inappropriate content through YouTube's recommendation system, this project aims to model that experience and analyze it using graph traversal techniques. While we're working with simple detection methods now, the architecture is designed to support more advanced analysis in the future.
-
----
-
-## 🎥 Video Collection Strategy
-
-- **Initial Approach**: Planned to use autoplay tracking with Selenium but switched due to YouTube's automation detection.
-- **Current Approach**: Manually curated seed playlists. Store video IDs + their recommendations in `manual_video_links`.
-- Notes:
-  - Ensures data collection is repeatable and doesn't violate TOS
-  - Seed videos are marked "Made for Kids" for cleaner analysis baseline
-- ✅ Works with transcripts, comments, and metadata consistently
+## 📚 Table of Contents
+- [📦 Data Collection Pipeline](#-data-collection-pipeline)
+- [🔍 Flagging & Dictionary Strategy](#-flagging--dictionary-strategy)
+- [🧠 Graph Structure & Algorithms](#-graph-structure--algorithms)
+- [🌐 Visualization](#-visualization)
+- [🧪 Testing & Structure](#-testing--structure)
+- [🚀 Next Steps](#-next-steps)
+- [🧠 Observations](#-observations)
 
 ---
 
-## 🚩 Profanity Dictionary & Flagging System
+## 📦 Data Collection Pipeline
 
-- Built as a `JSON` file with words grouped by category
-- Includes flexible matching with regular expressions (e.g. boundary checking for "ass")
-- Applied to:
-  - Video descriptions
-  - Transcripts
-  - Comments (first 10 per video)
-- Design Decision:
-  - `videos.flagged` and `comments.flagged` store count of matched terms
-  - `video_flag_counts` summarizes total flags per video (via script, not trigger)
+**Purpose**: Recursively gather metadata, transcripts, and comments for videos recommended by YouTube starting from a known safe video.
+
+**Strategy**:
+- Initially gathered parent → child pairs manually
+- Replaced autoplay scraping with curated playlists
+- Used YouTube API to extract full lists of video IDs from playlist links
+- Later modified the system to support inputting **multiple playlists at once**
+- Stored all data in SQLite for flexibility and easy joins
 
 ---
 
-## 🗃️ Database Schema Decisions
+**🗓️ Updates**
+- *Mar 14*: Stopped Selenium/autoplay scraping due to detection risk and fragility
+- *Mar 18*: Manually collected video IDs by clicking through suggestions and pasting IDs
+- *Mar 22*: Switched to using **YouTube Playlist IDs** with the API to pull video IDs
+- *Mar 25*: Updated playlist fetch script to handle **multiple playlists at once**
+- *Apr 8*: Created `run_all.py` to combine metadata fetch, transcript, comment, and flagging steps into a single command
 
-- All data is stored in SQLite (`youtube_data.db`)
-- Key tables:
-  - `videos`, `comments`, `manual_video_links`, `video_stats`, `video_flag_counts`
-- Dropped triggers due to inconsistent behavior with recursive updates
-- Added `backup_db.py` script with:
-  - Zip compression
-  - Log rotation
-  - Max backup retention (10 backups)
+---
+
+## 🔍 Flagging & Dictionary Strategy
+
+**Purpose**: Identify potentially inappropriate videos using a flexible keyword-matching system based on title, description, transcript, and comments.
+
+**Strategy**:
+- Dictionary of flagged phrases (including emoji and leetspeak variants)
+- Python scripts search each text field and count total matches per video
+- Designed for extensibility if using classifier or LLM in future
+
+---
+
+**🗓️ Updates**
+- *Mar 17*: Converted initial word list into JSON structure
+- *Mar 21*: Added `flag_inappropriate.py` to update `video_flag_counts` in DB
+- *Mar 23*: Re-analyzed entire dataset with revised word list (~300 phrases)
 
 ---
 
 ## 🧠 Graph Structure & Algorithms
 
-- Implemented in C++ with adjacency list
-- Each node = video, edge = recommendation
-- Traversals:
-  - `A*`: Ideal for simulating direct paths to flagged content
-  - `Dijkstra`: Helps visualize risk spread / clustering
-  - `Random Walk`: Simulates casual browsing
-- Integration pending after data collection is complete
+**Core Logic**  
+- Implemented in C++ using adjacency list
+- Each node = video, each edge = parent→suggested relationship
+- Designed for multiple traversal strategies
+
+**Traversals**:
+- 🔍 A*: Simulates most direct route to high-risk content
+- 🧭 Dijkstra: Calculates shortest safe/unsafe paths for risk mapping
+- 🎲 Random Walk: Mimics a casual user clicking freely
 
 ---
 
-## 🧠 Language Model Possibilities
-
-- One teammate proposed using a small language model to assess:
-  - Video sentiment
-  - Transcript readability
-  - Semantic tone
-- We may not implement this before the final presentation, but the project is designed to grow in that direction
+**🗓️ Updates**
+- *Mar 23*: Added DFS with stack and refactored `loadGraphFromDB()` to support node weight annotations
+- *Mar 25*: Standardized all `getStat()` helper functions for views, likes, flags, comments
+- *Mar 26*: Fully implemented `exportFullGraphFromDB()` using SQL JOINs and JSON serialization
+- *Apr 9*: Cleaned graph export for 3D visualization compatibility; final testing and inline documentation completed
 
 ---
 
-## 💾 Backup & Logging System
+## 🌐 Visualization
 
-- Runs via `scripts/backup_db.py`
-- Features:
-  - Safe SQLite `.backup()` call
-  - Timestamped `.zip` output
-  - Auto deletes oldest backups after 10
-  - Logs stored in `backups/backup.log`
+**Purpose**: Show node relationships and flag counts using an interactive force-directed graph
 
----
-
-## 🔄 Roadblocks & Pivots
-
-- ❌ Selenium autoplay blocked by YouTube → ✅ switched to manual playlist strategy
-- ❌ Triggers caused inconsistent counts → ✅ replaced with end-of-script summary update
-- ❌ Comment scraping initially too aggressive → ✅ limited to top 10 per video
+**Stack**:
+- `graph.json` → exported from C++
+- `3d-force-graph` → JavaScript/Three.js wrapper
+- Python's http.server or VSCode Live Server
 
 ---
 
-## 🧭 Future Ideas
-
-- Use thumbnails / metadata for clickbait detection
-- Add YouTube Kids API (if accessible)
-- Introduce user simulation profiles (e.g., cautious vs. curious user)
-- Connect graph metrics to time-based trends
-- Implement dashboard-style visualizations
-- Train profanity model or LLM-based detector
+**🗓️ Updates**
+- *Apr 9*: Created `visualization/` folder and fully implemented 3D rendering of YouTube graph
+- *Apr 9*: Added real-time resizing support and custom styling
+- *Apr 9*: Confirmed browser compatibility and deployed local server using Python
 
 ---
 
-## ✍️ Scratchpad
+## 🧪 Testing & Structure
 
-Things that don’t fit neatly elsewhere, random ideas, things to revisit:
-
-- Idea: Graph color-coding based on content category?
-- Revisit: Should we use timestamps in transcripts to flag *when* inappropriate content appears?
-- Potential Bug: Dijkstra sometimes returns tie paths — should we randomize or pick shortest ID?
+**Strategy**:
+- Isolate each major step (collection, flagging, export, viz) for modular testing
+- Added command-line flag to export JSON independently
+- Stored playlist IDs and added notes to track growth over time
 
 ---
 
-# ✅ Dev Notes Recap – March 23
-Today was a major cleanup and enhancement milestone:
+**🗓️ Updates**
+- *Mar 23*: Added `"export"` mode to `main.cpp` to skip traversal
+- *Mar 26*: Added `.gitkeep` to preserve empty folders in repo
+- *Apr 9*: Confirmed `.gitignore` behavior for visualization output, DB, and backups
 
-📥 Massively expanded the dataset by adding curated videos from seed playlists.
+---
 
-🔧 Corrected data entries and established "ORIGINAL" as the universal parent node to allow testing across any seed.
+## 🚀 Next Steps
 
-🧪 Created a clean main.cpp test environment with flexible graph traversal calls.
+**Short-Term**:
+- Integrate A*, Dijkstra, and Random Walk into CLI for testable comparison
+- Allow traversal results to be exported for overlay in visualization
+- Add filters to hide/show nodes by group (Safe, Risky, Extreme)
 
-🧱 Enhanced graph.cpp to:
+**Mid-Term**:
+- Support GitHub Pages deployment or Netlify for demo
+- Support hover-based traversal path preview (with reset button)
+- Add snapshot mode (save .png of current state)
 
-- Display adjacency list with flags + classification.
-- Support classification logic per node.
-- Prepare for future weighted edge and full-node loading strategies.
+---
 
-💻 Implemented .gitignore to manage build artifacts, logs, temp files, and backups.
+## 🧠 Observations
 
-💾 Manually validated that the automated backup system is reliable, consistent, and low-impact.
-
-📌 Planning to:
-
-- Rename loadGraphFromDB() for parent-focused paths (optionally weight by suggestion rank).
-- Create a new function to ensure every unique video is a node and edges are weighted by views, with bi-directional support for cycles.
-- Use this to support algorithm comparisons and future visualizations.
+- Playlist-based discovery is fast and avoids automation detection
+- Visualization helped identify high-flag clusters and bridge nodes
+- Many flagged videos are multi-linked and could serve as pivot points for comparison
