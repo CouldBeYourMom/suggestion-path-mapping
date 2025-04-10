@@ -30,6 +30,7 @@ compile_log.txt
 # ========================
 # Visualization output
 data/graph.json
+visualization/graph.json
 
 # ========================
 # Keep backups/archive folder structure
