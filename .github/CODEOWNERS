@@ -4,9 +4,9 @@
 /cpp/graph.h            @CouldBeYourMom @Y-Berhie @kevinyuQ @schwartza-afs
 
 # Algorithm-specific ownership
-/cpp/search_astar.*     @kevinyuQ
-/cpp/search_dijkstra.*  @Y-Berhie
-/cpp/search_random_walk.* @schwartza-afs
+/cpp/search_astar.*     @kevinyuQ @CouldBeYourMom
+/cpp/search_dijkstra.*  @Y-Berhie @CouldBeYourMom
+/cpp/search_random_walk.* @schwartza-afs @CouldBeYourMom
 
 # Docs and config — owner only
 /README.md              @CouldBeYourMom

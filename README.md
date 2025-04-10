@@ -2,80 +2,97 @@
 
 ## 🎯 Project Overview
 
-This project explores how YouTube's suggestion system can lead viewers — particularly younger users — from safe, kid-friendly content to videos with potentially inappropriate language or themes. We start from a video marked "Made for Kids" and recursively collect metadata, transcripts, and comments from suggested videos.
+This project explores how YouTube’s suggestion system can lead viewers — particularly younger users — from **family-friendly content** to videos with potentially inappropriate language or themes. We start from a video known to be child-appropriate and recursively collect metadata, transcripts, and comments from suggested videos.
 
 Each video is evaluated using a dictionary of inappropriate words/phrases curated with input from mental health professionals and concerned parents. We flag matches found in titles, descriptions, transcripts, and comments, then use a graph structure to map how videos are connected through YouTube’s recommendations.
 
-## 🔧 How It Works
+## 🛠️ How It Works
 
-- 🧠 **Graph Structure (C++)**: Videos are nodes; suggested links are directed edges.
-- 🐍 **Data Collection (Python)**:
-  - Pulls metadata, comments, and transcripts using the YouTube API
-  - Stores everything in a local SQLite database
-- 🚩 **Flagging System**:
-  - Compares content against a growing dictionary of inappropriate language
-  - Supports re-analysis after dictionary updates
-- 🗺️ **Traversal Algorithms**:
-  - Designed to simulate how a viewer might progress from safe to unsafe content
-  - Implemented in C++ for performance and learning purposes
+- 🧠 **Graph Structure (C++)**:  
+  Videos are nodes; suggested links are directed edges.
+
+- 🐍 **Data Collection (Python)**:  
+  Gathers metadata, comments, and transcripts using the YouTube API and stores them in a local SQLite database.
+
+- 🚩 **Flagging System**:  
+  Compares video content against a growing dictionary of inappropriate language. Re-analysis is supported when the dictionary is updated.
+
+- 🌌 **3D Visualization**:  
+  The graph is exported as `graph.json` and rendered with [3d-force-graph](https://github.com/vasturiano/3d-force-graph).
+
+- 🔧 **Technologies Used**:  
+  Python · SQLite · C++ · VSCode · Git · JavaScript + Three.js
 
 ## 🧪 Algorithms (In Progress)
 
-We're experimenting with:
+We're designing traversal algorithms to simulate how a viewer might progress from safe to unsafe content, in order to **compare their behavior** and **evaluate risk** within the graph structure:
 
-- 🔍 **A\***: Find the shortest "path to corruption" from a starting video to one flagged for inappropriate content.
-- 🧭 **Dijkstra’s**: Map broader clusters of inappropriate video recommendations.
-- 🎲 **Random Walks**: Simulate a naive user (like a child) clicking through recommendations.
+- 🔍 **A\***: Finds the shortest "path to corruption" — from a known-safe video to one flagged for inappropriate content.
+- 🧭 **Dijkstra’s**: Maps broader clusters of video suggestions with increasing risk.
+- 🎲 **Random Walks**: Mimics a naive user (like a child) clicking randomly through recommendations.
 
-We’ve also discussed using language models to analyze semantic content — while that feature may not make it into the final demo, we’re designing the project so it can grow into that direction in the future.
+We’re also designing the structure so that future semantic analysis (via LLMs or classifiers) can be plugged in easily.
 
-## 🗃️ Project Structure
+## 📂 Project Structure
 
 ```plaintext
-data/               ← SQLite DB, flag dictionary, video ID lists
-scripts/            ← Python data collection + processing
-cpp/                ← Graph + traversal algorithm implementations
-backups/            ← Auto-generated daily database backups (.zip)
-archive/            ← Retired scripts preserved for transparency
-docs/               ← dev_notes.md and future extended documentation
+data/           ← SQLite DB, flag dictionary, playlist logs
+scripts/        ← Python scripts for collection & flagging
+cpp/            ← Graph + algorithm implementations (C++)
+visualization/  ← 3D rendering using ForceGraph3D + JSON export
+backups/        ← Daily zipped backups of the DB
+archive/        ← Deprecated or legacy scripts
+docs/           ← Dev notes and strategy logs
 ```
 
-## 🗃️ Key Features
+## 🔍 Key Features
 
-- ✅ Modular data collection
-- ✅ Recursion-aware transcript & comment fetching
-- ✅ Real-time flagging based on evolving criteria
-- ✅ Automated database backups with rotation & logging
+- ✅ Modular, recursive data collection
+- ✅ Real-time flagging with an updatable dictionary
+- ✅ Multiple traversal algorithms (testable + swappable)
+- ✅ JSON graph export for visualization
+- ✅ Auto-rotation of DB backups
 - ✅ Clean Git structure for collaboration
 
-## 📝 Extended Notes & Strategy Log
+## 📝 Extended Notes
 
-For deeper project decisions, collection strategy changes, and algorithm development logs, see docs/dev_notes.md. This doc complements our final presentation and report but focuses on process over polish.
+For design decisions, collection strategies, and team-specific workflows, see `docs/dev_notes.md`. This file serves as a running log of project milestones and pivots.
 
 ## 🚀 Getting Started
-
-These instructions will help you set up the project locally for development and testing.
 
 ### ✅ Prerequisites
 
 - Python 3.10+  
-- C++17 or later (for graph traversal algorithms)  
+- C++17 or later  
 - SQLite3  
 - YouTube Data API v3 key  
 - VSCode with Python & C++ extensions recommended
 
-### 🔧 Installation
-
-Clone the repository and install required Python packages.
+### 🔧 Setup
 
 ```bash
 $ git clone https://github.com/YOUR_USERNAME/suggestion-path-mapping
 $ cd suggestion-path-mapping
-$ cp .env.example .env
+$ cp .env.example .env      # Add your YouTube API key
+$ python scripts/run_all.py # Populate the database (see dev_notes for options)
 ```
 
-### 🙌🏻 Acknowledgements
+To compile and run the C++ traversal system:
 
+```bash
+$ ./scripts/compile_graph.sh    # Or follow the instructions in cpp/README.md
+$ ./bin/graph.exe export        # Generate visualization-ready JSON
+$ python -m http.server 5500    # Preview 3D graph in browser
+```
+
+## 🙌🏻 Acknowledgements
+
+- Built for **COP3530: Data Structures & Algorithms**
 - Mental health professionals who contributed to the inappropriate word list
-- YouTube API for making this dataset feasible
-- Our teammates for bringing their own specialities and interests into this collaboration
+- YouTube API for enabling this kind of research
+- Our teammates for bringing their skills and interests to this project:
+  - Yepeth Berhie (@Y-Berhie)  
+  - Carrie Ruble (@CouldBeYourMom)  
+  - Adam Schwartz (@schwartza-afs)  
+  - Kevin Yu (@kevinyu0)  
+- Visualization powered by [3d-force-graph](https://github.com/vasturiano/3d-force-graph)
