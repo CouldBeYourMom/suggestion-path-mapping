@@ -1,18 +1,30 @@
 #include "graph.h"
 #include <iostream>
-#include <sqlite3.h>
+#include <algorithm>  // for std::remove
 
-
-int main() {
+int main(int argc, char* argv[]) {
     Graph g;
 
-    // 📥 Load the graph from the SQLite database
-    g.loadGraphFromDB("data/youtube_data.db");
+    // Path to the SQLite database
+    std::string dbPath = "data/youtube_data.db";
 
-    // 🧪 Run a BFS traversal from a selected starting node
-    // Replace this ID with a real one from your DB when testing
+    // Default starting node for traversal
     std::string startNode = "ORIGINAL";
-    g.bfs(startNode);
+
+    // Parse command-line argument
+    std::string arg = (argc >= 2) ? argv[1] : "";
+    arg.erase(std::remove(arg.begin(), arg.end(), '\r'), arg.end());
+    arg.erase(std::remove(arg.begin(), arg.end(), '\n'), arg.end());
+
+    // 🗂️ EXPORT MODE: comment out to test traversal functions
+    if (arg == "export") {
+        g.exportFullGraphFromDB("data/graph.json", dbPath);
+        return 0;  // Exit early after export
+    }
+
+    // 🌐 Otherwise, load graph and run default or team search
+    g.loadGraphFromDB(dbPath);
+    g.bfs(startNode);      // Replace with desired traversal method
 
     // ---------------------------------------------
     // 🧑‍💻 Teammate References: Keep these here for testing
@@ -26,6 +38,6 @@ int main() {
     // Run Random Walk (teammate 3)
     // runRandomWalk(g, "VIDEO_ID_START");
     // ---------------------------------------------
-
+    
     return 0;
 }
