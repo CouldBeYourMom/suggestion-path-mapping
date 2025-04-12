@@ -16,7 +16,8 @@ public:
     void printGraph(sqlite3* db) const;
     void bfs(const std::string& startNode) const;
     void dfs(const std::string& startNode) const;
-
+    const std::unordered_map<std::string, std::vector<std::pair<std::string, double>>>& getAdjList() const;    // Added accessor for read-only access to the internal adjacency list.
+    
 private:
     std::unordered_map<std::string, std::vector<std::pair<std::string, double>>> adjList;
     std::unordered_map<std::string, int> flagCounts;
