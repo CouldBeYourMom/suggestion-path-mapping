@@ -132,6 +132,9 @@ void Graph::exportFullGraphFromDB(const std::string& filename, const std::string
     sqlite3_close(db);
 }
 
+    // Added accessor for read-only access to the adjacency list.
+    const std::unordered_map<std::string, std::vector<std::pair<std::string, double>>>& Graph::getAdjList() const {
+        return adjList;
 
 /*_____________
      Print 
