@@ -1,54 +1,47 @@
-# Ignore API keys, environment variables, or secret files
-.env
-config.json
+# ========================
+# Python cache and temp
+__pycache__/
+*.py[cod]
+*.sqlite3-journal
 
-# Ignore database files (sensitive data)
-data/*.db
-data/*.txt
-
-# Ignore database backups
-backups/
-
-# Ignore archived/old scripts
-archive/
-
-# Ignore compiled C++ files & build artifacts
-cpp/*.o
-cpp/*.out
-cpp/*.exe
-cpp/*.a
-cpp/*.lib
+# ========================
+# Compiled C++ files and build artifacts
+*.o
+*.out
+*.exe
+*.a
+*.lib
 bin/
 
-# Ignore Python cache & virtual environments
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.venv/
-venv/
+# ========================
+# Database files and personal text lists
+data/youtube_data.db
+data/*.txt  # includes playlist_video_ids.txt, etc.
 
-# Ignore logs, temp files, and dataset outputs
+# ========================
+# Environment and debug logs
+.env
 *.log
 *.tmp
 *.bak
+run_log.txt
 compile_log.txt
 
-# Ignore IDE/editor settings (VSCode, JetBrains, etc.)
-.vscode/
-.idea/
-*.swp
-*.swo
+# ========================
+# Visualization output
+data/graph.json
+visualization/graph.json
 
-# Ignore generated files (e.g., visualization outputs)
-visualization/
-
-# Keep directory but ignore all contents (except .gitkeep)
+# ========================
+# Keep backups/archive folder structure
 backups/*
 !backups/.gitkeep
-
 archive/*
 !archive/.gitkeep
 
-visualization/*
-!visualization/.gitkeep
+# ========================
+# OS and IDE-specific stuff
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

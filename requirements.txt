@@ -1,8 +1,14 @@
+# YouTube Data API access
 google-api-python-client==2.120.0
 google-auth==2.29.0
 google-auth-oauthlib==1.2.0
+
+# Transcript retrieval
 youtube-transcript-api==0.6.2
+
+# HTTP requests & progress bars
 requests==2.31.0
 tqdm==4.66.2
-python-dotenv==1.0.1
 
+# Environment variable handling
+python-dotenv==1.0.1

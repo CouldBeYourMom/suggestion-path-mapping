@@ -11,8 +11,11 @@ API_KEY = os.getenv("YOUTUBE_API_KEY")
 # Initialize YouTube API client
 youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=API_KEY)
 
-# ✅ ENTER PLAYLIST ID HERE BEFORE RUNNING
-PLAYLIST_ID = "PL_Jmhi7OOYAzEat-XW1lIajkyMy9q8b9v"
+# ✅ ENTER PLAYLIST IDS HERE
+PLAYLIST_IDS = [
+    "PlayListID begins with PL_...",
+    # Add more playlist IDs as needed
+]
 
 # Connect to SQLite database
 conn = sqlite3.connect("../data/youtube_data.db")
@@ -27,7 +30,7 @@ def fetch_playlist_videos(playlist_id):
         request = youtube.playlistItems().list(
             part="contentDetails,snippet",
             playlistId=playlist_id,
-            maxResults=50,  # Max per request
+            maxResults=50,
             pageToken=next_page_token
         )
         response = request.execute()
@@ -36,7 +39,6 @@ def fetch_playlist_videos(playlist_id):
             video_id = item["contentDetails"]["videoId"]
             title = item["snippet"]["title"]
             description = item["snippet"].get("description", "")
-
             videos.append((video_id, title, description))
 
         next_page_token = response.get("nextPageToken")
@@ -45,22 +47,22 @@ def fetch_playlist_videos(playlist_id):
 
     return videos
 
-# Fetch videos from the playlist
-video_list = fetch_playlist_videos(PLAYLIST_ID)
+# Function to process one playlist
+def process_playlist(playlist_id):
+    print(f"\n🎯 Processing playlist: {playlist_id}")
+    video_list = fetch_playlist_videos(playlist_id)
 
-if not video_list:
-    print("🚨 No videos found in the playlist!")
-else:
-    parent_video = video_list[0][0]  # First video is the parent
+    if not video_list:
+        print("🚨 No videos found in the playlist!")
+        return
+
+    parent_video = video_list[0][0]
     print(f"📌 Parent video: {parent_video}")
 
-    # Start transaction
     conn.execute("BEGIN")
-    
+
     try:
-        # Save video metadata & relationships
         for video_id, title, description in video_list:
-            # Insert video metadata
             cursor.execute("""
                 INSERT INTO videos (id, title, description, transcript, flagged, parent_id)
                 VALUES (?, ?, ?, NULL, 0, ?)
@@ -70,28 +72,29 @@ else:
                     parent_id = COALESCE(excluded.parent_id, ?)
             """, (video_id, title, description, parent_video, parent_video))
 
-            # Insert parent-child relationship (ignore duplicates)
             if video_id != parent_video:
                 cursor.execute("""
                     INSERT OR IGNORE INTO manual_video_links (parent_video, suggested_video)
                     VALUES (?, ?)
                 """, (parent_video, video_id))
 
-        # Commit changes
         conn.commit()
-        print(f"✅ Successfully inserted {len(video_list)} videos into the database!")
+        print(f"✅ Successfully inserted {len(video_list)} videos from playlist!")
 
-        # Save output file
+        # Append output to file
         output_path = "../data/playlist_video_ids.txt"
-        with open(output_path, "w", encoding="utf-8") as f:
-            for video_id, _, _ in video_list[1:]:  # Skip the first video (parent)
+        with open(output_path, "a", encoding="utf-8") as f:
+            f.write(f"\n# Playlist ID: {playlist_id}\n")
+            for video_id, _, _ in video_list[1:]:  # Skip the first (parent)
                 f.write(f"{parent_video} : {video_id}\n")
-
-        print(f"📄 Parent-child video list saved to {output_path}")
+        print(f"📄 Appended parent-child links to {output_path}")
 
     except Exception as e:
         conn.rollback()
         print(f"🚨 Error: {str(e)} — Rolling back changes!")
 
-    finally:
-        conn.close()
+# Loop through each playlist ID
+for pid in PLAYLIST_IDS:
+    process_playlist(pid)
+
+conn.close()
