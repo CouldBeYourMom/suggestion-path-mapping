@@ -1,75 +1,206 @@
 #include "graph.h"
+#include "search_astar.h"
+#include "search_dijkstra.h"
+#include "search_random_walk.h"
 #include <iostream>
 #include <sqlite3.h>
 #include <queue>
 #include <stack>
 #include <unordered_set>
+#include <functional>   // for std::hash
 #include <fstream>
+#include <chrono>
 #include "external/json.hpp"
 using json = nlohmann::json;
 
+
+/*____________________
+    User Input Menu
+  and Search Routing
+______________________*/
 /*
-Loads existing graph from database using standard STL containers. 
-Video relationships are stored in the manual_video_links table in the DB.
-loadGraphFromDB() simply translates it into an in-memory structure 
-(the adjacency list) when the program runs.
+Handles user prompt to select:
+ - Search algorithm type (DFS, A*, etc.)
+ - Weight type (likes, views, etc.)
+Builds the graph from DB using selected weight
+and dispatches the correct search function.
 */
-void Graph::loadGraphFromDB(const std::string& dbPath) {
-    std::ofstream log("run_log.txt", std::ios::app);
-    std::cout << "📡 Loading graph from: " << dbPath << std::endl;
+void Graph::userOptions() {
+    std::string dbPath = "data/youtube_data.db";
+    std::string searchType;
+    std::string weightType;
+
+    while (true) {
+        std::cout << "Choose search algorithm:\n"
+                  << "A - AStar\n"
+                  << "D - Dijkstra\n"
+                  << "R - RandomWalk\n"
+                  << "S - Standard DFS (testing only)\n> ";
+        std::getline(std::cin, searchType);
+        std::transform(searchType.begin(), searchType.end(), searchType.begin(), ::toupper);
+        if (searchType == "A" || searchType == "D" || searchType == "R" || searchType == "S") break;
+        std::cout << "❌ Invalid input. Try again.\n";
+    }
+
+    while (true) {
+        std::cout << "\nChoose weight type:\n"
+                  << "1 - flag_count\n"
+                  << "2 - like_count\n"
+                  << "3 - view_count\n"
+                  << "4 - comment_count\n> ";
+        std::getline(std::cin, weightType);
+        if (weightType == "1" || weightType == "2" || weightType == "3" || weightType == "4") break;
+        std::cout << "❌ Invalid input. Try again.\n";
+    }
+
+    std::string stat = (weightType == "1") ? "flag" :
+                       (weightType == "2") ? "like" :
+                       (weightType == "3") ? "view" : "comment";
+
+    std::cout << "🧠 Building graph using stat: " << stat << std::endl;
+    createGraphFromDB(dbPath, stat);
+    runSelectedSearch(searchType, stat);
+}
+
+/*_________________________
+    Dispatch Search Type
+     and Export Results
+___________________________*/
+/*
+Executes the selected search algorithm (DFS, A*, etc.)
+ - Start node is hardcoded as "ORIGINAL"
+ - Max node visit count is capped at 100 (for now)
+Results are passed to exportResults() for CSV logging.
+*/
+void Graph::runSelectedSearch(const std::string& searchType, const std::string& stat) {
+    std::string dbPath = "data/youtube_data.db";
+    std::string startNode = "ORIGINAL";
+    int maxNodes = 100; // Adjust or make this configurable later
+    std::vector<std::pair<std::string, double>> result;
+    
+    if (searchType == "S") {
+        result = dfs(startNode);
+        exportResults(result, "dfs", stat);
+    } else if (searchType == "A") {
+        result = runAStar(*this, startNode, maxNodes, stat);
+        exportResults(result, "astar", stat);
+    } else if (searchType == "D") {
+        result = runDijkstra(*this, startNode, maxNodes, stat);
+        exportResults(result, "dijkstra", stat);
+    } else if (searchType == "R") {
+        result = runRandomWalk(*this, startNode, maxNodes, stat);
+        exportResults(result, "randomwalk", stat);
+    }
+}
+
+/*_________________________
+  Load Adjacency List from 
+       Database (SQLite)
+___________________________*/
+/*
+Queries the database to:
+ - Read parent → suggested relationships
+ - Assign weights based on chosen stat
+ - Populate in-memory adjacency list
+Also calls loadVideoStatsMap() to preload stats for each video.
+*/
+void Graph::createGraphFromDB(const std::string& dbPath, const std::string& stat) {
+    std::ofstream log("run_log.txt", std::ios::out);
+    std::cout << "📂 Loading graph from: " << dbPath << std::endl;
+
     sqlite3* db;
     if (sqlite3_open(dbPath.c_str(), &db) != SQLITE_OK) {
-        std::cerr << "Failed to open database: " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "[ERROR] Failed to open database: " << sqlite3_errmsg(db) << std::endl;
         return;
     }
 
+    loadVideoStatsMap(db);
+
     sqlite3_stmt* stmt;
-    std::string query = "SELECT parent_video, suggested_video FROM manual_video_links";
+    std::string query = R"(
+        SELECT 
+            parent_video,
+            suggested_video,
+            title,
+            flag_count,
+            like_count,
+            view_count,
+            comment_count
+        FROM video_edges_full
+    )";
 
     if (sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
-        // Iterate over each row in the manual_video_links table and add directed edges to the adjacency list
         while (sqlite3_step(stmt) == SQLITE_ROW) {
-            std::string parent = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+            std::string parent    = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
             std::string suggested = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
-            log << "Adding edge: " << parent << " -> " << suggested << std::endl;
-            adjList[parent].emplace_back(suggested, 1.0);  // Default weight = 1.0
+            double flagCount      = sqlite3_column_double(stmt, 2);
+            double likeCount      = sqlite3_column_double(stmt, 3);
+            double viewCount      = sqlite3_column_double(stmt, 4);
+            double commentCount   = sqlite3_column_double(stmt, 5);
+
+            double weight = 1.0; // fallback default
+            if (stat == "flag") weight = flagCount;
+            else if (stat == "like") weight = likeCount;
+            else if (stat == "view") weight = viewCount;
+            else if (stat == "comment") weight = commentCount;
+
+            adjList[parent].emplace_back(suggested, weight);
+            log << "Adding edge: " << parent << " -> " << suggested
+                << " (weight = " << weight << ")" << std::endl;
         }
         sqlite3_finalize(stmt);
     } else {
-        std::cerr << "Failed to prepare statement." << std::endl;
-    }
-
-    // Load node flag weights
-    query = "SELECT video_id, flag_count FROM video_flag_counts";
-    if (sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
-        while (sqlite3_step(stmt) == SQLITE_ROW) {
-            std::string videoId = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
-            int flagCount = sqlite3_column_int(stmt, 1);
-            flagCounts[videoId] = flagCount;
-        }
-        sqlite3_finalize(stmt);
+        std::cerr << "[ERROR] Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
     }
 
     log.close();
     sqlite3_close(db);
 }
 
-/*_____________
-  Visualization 
-    Support
-_______________*/
+/*____________________________
+  Populate VideoStats Map from 
+        Database (SQLite)
+______________________________*/
 /*
-Export the full graph to a JSON file in 3D-force-graph format.
-
-This function:
- - Selects all videos from the database (id, title, flag_count).
- - Joins with `video_flag_counts` to include the total flags for each video.
- - Labels each video with a "group" based on how inappropriate it is.
- - Exports each parent-child relationship (suggestion) from `manual_video_links`.
-
- This output is used in the frontend visualization with ForceGraph3D.
+Loads title and stat info for each unique video into
+an in-memory map (`videoStatsMap`) to avoid redundant DB access.
+Used by exportResults() and search functions.
 */
-void Graph::exportFullGraphFromDB(const std::string& filename, const std::string& dbPath) {
+void Graph::loadVideoStatsMap(sqlite3* db) {
+    sqlite3_stmt* stmt;
+    std::string query = R"(
+        SELECT DISTINCT suggested_video, title, flag_count, like_count, view_count, comment_count
+        FROM video_edges_full
+    )";
+
+    if (sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            std::string id    = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+            std::string title = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+            int flag          = sqlite3_column_int(stmt, 2);
+            int like          = sqlite3_column_int(stmt, 3);
+            int view          = sqlite3_column_int(stmt, 4);
+            int comment       = sqlite3_column_int(stmt, 5);
+
+            videoStatsMap[id] = { title, flag, like, view, comment };
+        }
+        sqlite3_finalize(stmt);
+    } else {
+        std::cerr << "[ERROR] Failed to prepare stat query: " << sqlite3_errmsg(db) << std::endl;
+    }
+}
+
+/*_________________________
+  Export Graph for 3D JSON 
+     Visualization Format
+___________________________*/
+/*
+Builds a JSON file compatible with ForceGraph3D:
+ - Nodes include ID, title, flag count, and safety label
+ - Links pulled from manual_video_links
+Used for rendering full suggestion graphs in the browser.
+*/
+void Graph::vizGraphFromDB(const std::string& filename, const std::string& dbPath) {
     sqlite3* db;
     if (sqlite3_open(dbPath.c_str(), &db) != SQLITE_OK) {
         std::cerr << "[ERROR] Failed to open database: " << dbPath << std::endl;
@@ -132,12 +263,16 @@ void Graph::exportFullGraphFromDB(const std::string& filename, const std::string
     sqlite3_close(db);
 }
 
-
-/*_____________
-     Print 
-    Function
-_______________*/
-
+/*_____________________
+   Print Adjacency List
+   with Live DB Lookups
+_______________________*/
+/*
+Prints the adjacency list:
+ - For each edge, retrieves live title and flag info from DB
+ - Outputs formatted line with weights, safety labels, and video titles
+Used for debugging and quick DB verification.
+*/
 void Graph::printGraph(sqlite3* db) const {
     for (const auto& pair : adjList) {
         std::cout << pair.first << " -> ";
@@ -155,12 +290,178 @@ void Graph::printGraph(sqlite3* db) const {
     }
 }
 
-/*_____________
-     Safety 
- Classifications
-   Of Videos
-_______________*/
+/*_________________________
+   Export Search Results to 
+   CSV with Stats and Time
+___________________________*/
+/*
+Saves search results to a CSV:
+ - Includes timestamp (ms), video ID, stat info, and title
+ - Filenames begin with search type and are time-stamped
+ - Appends total elapsed time at bottom
+Used for logging path traversal and benchmarking.
+*/
+void Graph::exportResults(
+    const std::vector<std::pair<std::string, double>>& result,
+    const std::string& searchType,
+    const std::string& stat) const
+{
+    // Generate timestamp for file name
+    auto now = std::chrono::system_clock::now();
+    std::time_t timeNow = std::chrono::system_clock::to_time_t(now);
+    std::tm* timeInfo = std::localtime(&timeNow);
 
+    // Filename
+    char timestamp[50];
+    std::strftime(timestamp, sizeof(timestamp), "%Y-%m-%d_%H-%M-%S", timeInfo);
+    std::string outFile = "data/" + searchType + "_logs/" + searchType + "_" + timestamp + "_" + stat + ".csv";
+
+    std::ofstream file(outFile);
+    if (!file.is_open()) {
+        std::cerr << "[ERROR] Could not write to file: " << outFile << std::endl;
+        return;
+    }
+
+    // CSV Header
+    file << "order,timestamp_ms,video_id,flag_count,like_count,view_count,comment_count,title\n";
+
+    auto start = std::chrono::steady_clock::now();
+
+    for (size_t i = 0; i < result.size(); ++i) {
+        const auto& [videoId, timestampMs] = result[i];
+        std::string title = "[Unknown]";
+        int flagCount = 0, likeCount = 0, viewCount = 0, commentCount = 0;
+
+        // Lookup video stats from preloaded map
+        auto it = videoStatsMap.find(videoId);
+        if (it != videoStatsMap.end()) {
+            const auto& stats = it->second;
+            title = stats.title;
+            flagCount = stats.flagCount;
+            likeCount = stats.likeCount;
+            viewCount = stats.viewCount;
+            commentCount = stats.commentCount;
+        }
+
+        file << i + 1 << ","
+            << timestampMs << ","
+            << videoId << ","
+            << flagCount << ","
+            << likeCount << ","
+            << viewCount << ","
+            << commentCount << ","
+            << title << "\n";
+    }
+
+    // Add total time elapsed at bottom of file
+    if (!result.empty()) {
+        double totalElapsed = result.back().second - result.front().second;
+        file << ","
+             << totalElapsed << ","
+             << "[TOTAL TIME ELAPSED]" << ",,,,,\n";
+    }
+
+    file.close();
+    std::cout << "✅ Search results exported to: " << outFile << std::endl;
+}
+
+/*_____________________
+   DFS Path Traversal
+  with Revisit Logic
+_______________________*/
+/*
+Performs a modified DFS traversal:
+ - Allows revisits if parent path changes
+ - Records visit time (ms since DFS start)
+Returns a vector of visited nodes with timestamps.
+*/
+std::vector<std::pair<std::string, double>> Graph::dfs(const std::string& startNode) const {
+    std::vector<std::pair<std::string, double>> visited;
+    auto startTime = std::chrono::steady_clock::now();
+
+    if (adjList.find(startNode) == adjList.end()) {
+        std::cerr << "[ERROR] Start node not found: " << startNode << std::endl;
+        return visited;
+    }
+
+    std::stack<std::pair<std::string, std::string>> s;  // {current, parent}
+    s.push({startNode, ""});
+
+    // Track visited (node, parent) pairs
+    std::unordered_set<std::pair<std::string, std::string>, pair_hash> visitedPairs; // Hashmap to keep track of parent-child visits
+
+    while (!s.empty()) {
+        auto [current, parent] = s.top();
+        s.pop();
+
+        // Only continue if this (node, parent) combo hasn't been visited
+        if (visitedPairs.count({current, parent})) continue;
+        visitedPairs.insert({current, parent});
+
+        auto now = std::chrono::steady_clock::now();
+        double elapsed = std::chrono::duration<double, std::milli>(now - startTime).count();
+        visited.emplace_back(current, elapsed);
+
+        if (adjList.find(current) != adjList.end()) {
+            const auto& neighbors = adjList.at(current);
+            for (auto it = neighbors.rbegin(); it != neighbors.rend(); ++it) {
+                s.push({it->first, current});
+            }
+        }
+    }
+    return visited;
+}
+
+/*_____________________
+   BFS Path Traversal
+_______________________*/
+/*
+Performs a standard unweighted BFS traversal:
+ - Logs each visited node to std::cout
+ - Does not export results or track timestamps
+Primarily used for manual inspection.
+*/
+void Graph::bfs(const std::string& startNode) const {
+    if (adjList.find(startNode) == adjList.end()) {
+        std::cout << "Start node not found: " << startNode << std::endl;
+        return;
+    }
+
+    std::queue<std::string> q;
+    std::unordered_set<std::string> visited;
+
+    q.push(startNode);
+    visited.insert(startNode);
+
+    std::cout << "BFS Traversal (ignoring edge weights):\n";
+
+    while (!q.empty()) {
+        std::string current = q.front();
+        q.pop();
+        std::cout << "Visited: " << current << std::endl;
+    
+        // Check if current has any neighbors before accessing adjList
+        if (adjList.find(current) != adjList.end()) {
+            for (const auto& neighbor : adjList.at(current)) {
+                if (!visited.count(neighbor.first)) {
+                    visited.insert(neighbor.first);
+                    q.push(neighbor.first);
+                }
+            }
+        }
+    }
+
+    std::cout << "\nTraversal complete.\n";
+}
+
+/*_____________________
+  Classify Flag Severity
+_______________________*/
+/*
+Maps numeric flag count to a safety category:
+ - Returns emoji-coded label (e.g., "🟡 Mild")
+Used for classification in graph export and terminal output.
+*/
 std::string Graph::classifyFlagLevel(int flags) const{
     if (flags == 0) return "🟢 Safe";
     if (flags <= 5) return "🟡 Mild";
@@ -170,11 +471,15 @@ std::string Graph::classifyFlagLevel(int flags) const{
     return "☠️ Extreme";
 }
 
-/*_____________
-  Video Stat
-Helper Functions
-_______________*/
-
+/*_________________________
+  Video Stat Helper Functions
+   (Flag, Like, View, Comment)
+___________________________*/
+/*
+Each function pulls a single stat value from the database
+ - Used by printGraph() and internal analytics
+ - Fallbacks to 0 if not found
+*/
 int Graph::getFlagCount(const std::string& videoId, sqlite3* db) const {
     int flags = 0;
     sqlite3_stmt* stmt;
@@ -250,90 +555,15 @@ int Graph::getCommentCount(const std::string& videoId, sqlite3* db) const {
     return comments;
 }
 
-
-/*_____________
-    Standard
-  BFS Traversal
-_______________*/
-
-void Graph::bfs(const std::string& startNode) const {
-    if (adjList.find(startNode) == adjList.end()) {
-        std::cout << "Start node not found: " << startNode << std::endl;
-        return;
-    }
-
-    std::queue<std::string> q;
-    std::unordered_set<std::string> visited;
-
-    q.push(startNode);
-    visited.insert(startNode);
-
-    std::cout << "BFS Traversal (ignoring edge weights):\n";
-
-    while (!q.empty()) {
-        std::string current = q.front();
-        q.pop();
-        std::cout << "Visited: " << current << std::endl;
-    
-        // Check if current has any neighbors before accessing adjList
-        if (adjList.find(current) != adjList.end()) {
-            for (const auto& neighbor : adjList.at(current)) {
-                if (!visited.count(neighbor.first)) {
-                    visited.insert(neighbor.first);
-                    q.push(neighbor.first);
-                }
-            }
-        }
-    }
-
-    std::cout << "\nTraversal complete.\n";
-}
-
-/*_____________
-    Standard
-  DFS Traversal
-_______________*/
-
-void Graph::dfs(const std::string& startNode) const {
-    if (adjList.find(startNode) == adjList.end()) {
-        std::cout << "Start node not found: " << startNode << std::endl;
-        return;
-    }
-
-    std::stack<std::string> s;
-    std::unordered_set<std::string> visited;
-
-    s.push(startNode);
-    std::cout << "DFS Traversal (ignoring edge weights):\n";
-
-    while (!s.empty()) {
-        std::string current = s.top();
-        s.pop();
-
-        if (visited.count(current)) continue;
-
-        visited.insert(current);
-        std::cout << "Visited: " << current << std::endl;
-
-        if (adjList.find(current) != adjList.end()) {
-            // Reverse to maintain DFS ordering like recursion
-            const auto& neighbors = adjList.at(current);
-            for (auto it = neighbors.rbegin(); it != neighbors.rend(); ++it) {
-                if (!visited.count(it->first)) {
-                    s.push(it->first);
-                }
-            }
-        }
-    }
-
-    std::cout << "\nTraversal complete.\n";
-}
-
-
-/*_____________
-   Destructor
-_______________*/
-
+/*_____________________
+     Graph Destructor
+_______________________*/
+/*
+Ensures graph cleanup by clearing:
+ - Adjacency list
+ - Flag counts
+Optional since program exits quickly, but good for hygiene.
+*/
 Graph::~Graph() {
     adjList.clear();
     flagCounts.clear();
