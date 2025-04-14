@@ -75,6 +75,10 @@ Sections below reflect major functional areas with short, dated updates to track
 - *Mar 25*: Standardized all `getStat()` helper functions for views, likes, flags, comments
 - *Mar 26*: Fully implemented `exportFullGraphFromDB()` using SQL JOINs and JSON serialization
 - *Apr 9*: Cleaned graph export for 3D visualization compatibility; final testing and inline documentation completed
+- *Apr 13–14*: Refactored `graph.cpp` and `graph.h` to finalize traversal logic:
+  - Added `visitedPairs` (unordered_set with custom `pair_hash`) to track `(child, parent)` visits. This ensures we allow revisits to nodes through different paths (as needed for YouTube structure), while preventing infinite loops from repeated edge traversals.
+  - Updated all `search_*.cpp` stubs with final integration format for team members. Each includes `visitedPairs` scaffolding, elapsed time tracking, and support for `maxNodesToVisit` (optional).
+  - Added `userOptions()` and `runSelectedSearch()` for cleaner CLI flow — now supports stat selection and dispatches to the correct traversal with logging built-in.
 
 ---
 
@@ -109,13 +113,20 @@ Sections below reflect major functional areas with short, dated updates to track
 - *Mar 23*: Added `"export"` mode to `main.cpp` to skip traversal
 - *Mar 26*: Added `.gitkeep` to preserve empty folders in repo
 - *Apr 9*: Confirmed `.gitignore` behavior for visualization output, DB, and backups
-
+- *Apr 14*: Implemented CSV export functionality for traversal results via `exportResults()`. Output includes:
+  - `order`, `timestamp_ms`, `video_id`, `flag_count`, `like_count`, `view_count`, `comment_count`, `title`
+  - Total time elapsed recorded at the bottom
+  - Filename format: `[searchType]_[timestamp]_[stat].csv`
+- *Apr 14*: Created per-search output folders under `data/` (e.g., `dfs_logs/`, `astar_logs/`) and added `.gitkeep` to preserve them in Git.
+- *Apr 14*: Committed 4 example DFS exports for evaluation and instructor review.
 ---
 
 ## 🚀 Next Steps
 
 **Short-Term**:
-- Integrate A*, Dijkstra, and Random Walk into CLI for testable comparison
+- Add optional cleanup or log rotation strategy for `data/*_logs/` folders (e.g., keep last 10 files)
+- Verify A*, Dijkstra, and Random Walk output correctness once team members push their working implementations
+- Add sample script or Makefile target to compile and run with `main.cpp` + selected search file
 - Allow traversal results to be exported for overlay in visualization
 - Add filters to hide/show nodes by group (Safe, Risky, Extreme)
 
