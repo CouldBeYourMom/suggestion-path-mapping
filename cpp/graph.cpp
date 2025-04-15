@@ -555,6 +555,21 @@ int Graph::getCommentCount(const std::string& videoId, sqlite3* db) const {
     return comments;
 }
 
+/*_________________________
+     TRAVERSAL Helper 
+        Functions
+___________________________*/
+/* 
+ Retrieves a list of adjacent nodes and edge weights for the given node ID
+ - Used by external search algorithms (e.g., A*, Dijkstra, RandomWalk)
+ - Returns an empty vector if node ID is not found in the graph
+*/
+const std::vector<std::pair<std::string, int>>& Graph::getNeighbors(const std::string& nodeId) const {
+    static const std::vector<std::pair<std::string, int>> empty; // Fallback
+    auto it = adjList.find(nodeId);
+    return (it != adjList.end()) ? it->second : empty;
+}
+
 /*_____________________
      Graph Destructor
 _______________________*/
