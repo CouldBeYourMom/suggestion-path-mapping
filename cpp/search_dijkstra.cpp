@@ -40,7 +40,7 @@ std::vector<std::pair<std::string, double>> runDijkstra(
     // Negating the distance, so max-heap will behave like a min-heap
     pq.push(std::make_tuple(-0.0, startNode, ""));
 
-    // Loop until no more videos or we reach maximum number for visit count
+    // Loop until no more videos, or we reach maximum number for visit count
     while (!pq.empty() && visitCount < maxNodesToVisit)
     {
         // Pop the top of the heap and setup variables for its data
@@ -63,7 +63,7 @@ std::vector<std::pair<std::string, double>> runDijkstra(
 
         // Get neighbors for currentNode and push them onto the Heap
         const auto& neighbors = g.getNeighbors(currentNode);
-        for (int i = 0; i < neighbors.size(); i++)
+        for (size_t i = 0; i < neighbors.size(); i++)
         {
             std::string neighborId = neighbors[i].first;
             int weight = neighbors[i].second;
