@@ -23,17 +23,18 @@ std::vector<std::string> reconstructPath() {
 
 std::vector<std::string> SearchAStar::astar(const Graph& graph, const std::string& startNode, const std::string& endNode) {
     // TODO: Implement A* Search Algorithm
-    std::vector<std::pair<std::string, double>> result;
-    std::priority_queue<std::string> open;
-    std::vector<std::string> shortestPath;
+
+    std::vector<std::pair<std::string, double>> visited; // Retruning this vector: visited : vector of (video_id, time_since_start_in_ms)
+    auto startTime = std::chrono::steady_clock::now(); // Start the clock
+    int visitCount = 0;
     // Define lambda function for comparing values in PQ.
-    // Returns true if a comes before b. However, b is the first to come out.
-    // f_a > f_b: b will come out first if it has smaller f value
     auto cmp = [](std::string firstNode, std::string secondNode){
         return fValues[firstNode] > fValues[secondNode];
     };
     // Define priority queue
     std::priority_queue<std::string, std::vector<std::string>, decltype(cmp)> unprocessed(cmp);
+    // Create hash maps for tracking distances, f values, and parents.
+    //std::unordered_set<std::pair<std::string, std::string>, pair_hash> visitedPairs;
     fValues[startNode] = 0;
     gValues[startNode] = 0;
 
