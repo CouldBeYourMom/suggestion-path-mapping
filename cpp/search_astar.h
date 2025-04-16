@@ -11,6 +11,15 @@
 
 // Kevin Yu: Implementing A* search algorithm
 
+// Returns a list of (video ID, elapsed time timestamp)
+std::vector<std::pair<std::string, double>> runAStar(
+    const Graph& g,
+    const std::string& startNode,
+    int maxNodesToVisit,
+    const std::string& weightType
+);
+
+// TODOlater: Remove the old stuff below; replace it with the new function above.
 class SearchAStar {
   // Keep track of f values and g values for each node.
     static std::unordered_map<std::string, float> gValues;
