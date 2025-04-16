@@ -2,27 +2,11 @@
 #include <chrono>
 #include <iostream>
 
-/*
- * Input: A node in the graph.
- * Output: The heuristic value for this node.
- * This function should calculate the heuristic value for a node using the heuristic function.
- *
- */
-float SearchAStar::heuristic(const std::string& startNode) {
 
-    // Potential heuristic: number of views in the node's video
-    return 0.0;
-}
 
-/*
- *
- */
-std::vector<std::string> reconstructPath() {
- 	int x;
-}
-
-double calculateHeuristic(std::string& node, const std::string& weightType) {
+double calculateHeuristic(const Graph& g, std::string& node, const std::string& weightType) {
     // Heuristic estimate is just extracting edge weight.
+    return 3.0;
 }
 
 
@@ -47,7 +31,7 @@ std::vector<std::pair<std::string, double>> runAStar(
         //return fValues[firstNode] > fValues[secondNode];
         return firstNodeF.second > secondNodeF.second;
     };
-    std::priority_queue<std::string, std::vector<std::string>, decltype(cmp)> unprocessed(cmp);
+    std::priority_queue<std::pair<std::string, double>, std::vector<std::pair<std::string, double>>, decltype(cmp)> unprocessed(cmp);
 
     // Insert the start node
     fValues[startNode] = 0;
@@ -60,7 +44,8 @@ std::vector<std::pair<std::string, double>> runAStar(
             break;
         }
         // Get current node
-        std::string curr = unprocessed.top();
+        std::pair<std::string, double> pqTop = unprocessed.top();
+        std::string curr = pqTop.first;
         unprocessed.pop();
         // Mark node as visited
         // Retrieve the time stamp and time elapsed
@@ -70,62 +55,29 @@ std::vector<std::pair<std::string, double>> runAStar(
 
         auto neighbors = g.getNeighbors(curr);
         if (neighbors.size() == 0) continue;
+        // Now go through neighbors and add neighbors into priority queue.
         for (std::pair<std::string, int> neighborWeight : neighbors) {
             std::string neighbor = neighborWeight.first;
             int weight = neighborWeight.second;
 
             if (distances.find(neighbor) == distances.end() || fValues.find(neighbor) == fValues.end()) {
                 // distances has not been visited
+                parents[neighbor] = curr;
+                distances[neighbor] = distances[curr] + weight;
+                fValues[neighbor] = distances[neighbor] + calculateHeuristic(g, neighbor, weightType);
             } else {
-                double tentative = distances[neighbor] + calculateHeuristic(neighbor, weightType);
+                double tentative = distances[neighbor] + calculateHeuristic(g, neighbor, weightType);
                 if (tentative < fValues[neighbor]) {
                     fValues[neighbor] = tentative;
                     parents[neighbor] = curr;
                     distances[neighbor] = distances[curr] + weight;
                 }
-
             }
+            // Add neighbors into priority queue.
+            std::pair<std::string, double> newNeighborPair{neighbor, fValues[neighbor]};
+            unprocessed.push(newNeighborPair);
 
         }
     }
-}
-
-std::vector<std::string> SearchAStar::astar(const Graph& graph, const std::string& startNode, const std::string& endNode) {
-    // TODOlater: Implement A* Search Algorithm
-
-
-    // Define priority queue
-    std::priority_queue<std::string, std::vector<std::string>, decltype(cmp)> unprocessed(cmp);
-    // Create hash maps for tracking distances, f values, and parents.
-    //std::unordered_set<std::pair<std::string, std::string>, pair_hash> visitedPairs;
-    fValues[startNode] = 0;
-    gValues[startNode] = 0;
-
-
-    //
-    while (!unprocessed.empty()) {
-        std::string currentNode = unprocessed.top();
-        unprocessed.pop();
-
-        // Retrieve neighbors of currentNode
-        std::vector<std::string> neighbors = graph.adjList.at(currentNode);
-        // For each neighbor of currentNode.
-        for (auto n : neighbors) {
-            // Calculate tentative g value for neighbor. g(neighbor) = g(currentNode) + weight(currentNode to neighbor)
-            float edgeWeight = 0.0; // Get edge weight from current node to the neighbor.
-            float tentativeG = gValues[currentNode] + edgeWeight; // tentativeG = g(currentNode) + edge weight
-
-            // if tentative g is less than current g value of neighbor, perform updates.
-            if (tentativeG < gValues[n]) {
-                // Perform updates: update g(neighbor) and f(neighbor). Update parent(neighbor)
-                gValues[n] = tentativeG;
-                fValues[n] = gValues[n] + heuristic(n);
-            }
-
-            // Add neighbor to priority queue.
-            unprocessed.push(n);
-        }
-    }
-
-    return result;
+    return visited;
 }
