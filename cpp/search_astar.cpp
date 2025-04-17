@@ -25,6 +25,7 @@ std::vector<std::pair<std::string, double>> runAStar(
     std::unordered_map<std::string, std::string> parents;
     std::unordered_map<std::string, double> fValues;
     std::unordered_map<std::string, double> distances;
+    std::unordered_set<std::string> visitedNodes;
 
     // Define lambda function for comparing values in PQ.
     auto cmp = [](std::pair<std::string, double> firstNodeF, std::pair<std::string, double> secondNodeF){
@@ -47,21 +48,28 @@ std::vector<std::pair<std::string, double>> runAStar(
         std::pair<std::string, double> pqTop = unprocessed.top();
         std::string curr = pqTop.first;
         unprocessed.pop();
-        // Mark node as visited
+        // Check if current node was visited; mark as visited if it hasn't
+        if (visitedNodes.find(curr) != visitedNodes.end()) {
+            // This node has already been visited. Do not visit it again.
+            continue;
+        }
+        visitedNodes.insert(curr);
         // Retrieve the time stamp and time elapsed
         auto now = std::chrono::steady_clock::now();
         double elapsed = std::chrono::duration<double, std::milli>(now - startTime).count();
         visited.emplace_back(curr, elapsed);
 
         auto neighbors = g.getNeighbors(curr);
-        if (neighbors.size() == 0) continue;
+        if (neighbors.size() == 0) {
+            continue;
+        }
         // Now go through neighbors and add neighbors into priority queue.
         for (std::pair<std::string, int> neighborWeight : neighbors) {
             std::string neighbor = neighborWeight.first;
             int weight = neighborWeight.second;
 
             if (distances.find(neighbor) == distances.end() || fValues.find(neighbor) == fValues.end()) {
-                // distances has not been visited
+                // Neighbor does not yet have assigned distance
                 parents[neighbor] = curr;
                 distances[neighbor] = distances[curr] + weight;
                 fValues[neighbor] = distances[neighbor] + calculateHeuristic(g, neighbor, weightType);
@@ -76,8 +84,7 @@ std::vector<std::pair<std::string, double>> runAStar(
             // Add neighbors into priority queue.
             std::pair<std::string, double> newNeighborPair{neighbor, fValues[neighbor]};
             unprocessed.push(newNeighborPair);
-
         }
-    }
+    } // Finish processing data
     return visited;
 }
