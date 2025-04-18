@@ -16,7 +16,6 @@ bin/
 # ========================
 # Database files and personal text lists
 data/youtube_data.db
-data/*.txt  # includes playlist_video_ids.txt, etc.
 
 # ========================
 # Environment and debug logs
