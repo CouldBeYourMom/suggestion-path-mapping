@@ -2,7 +2,6 @@
 #include <chrono>
 #include <iostream>
 
-// This replaces your old SearchRandomWalk::randomWalk() and gives you the final format for team integration
 std::vector<std::pair<std::string, double>> runRandomWalk(
     const Graph& g,
     const std::string& startNode,
@@ -11,9 +10,8 @@ std::vector<std::pair<std::string, double>> runRandomWalk(
 ) {
     // Keep these following 3 lines here
     std::vector<std::pair<std::string, double>> visited; // visited : vector of (video_id, time_since_start_in_ms)
-    //auto startTime = std::chrono::steady_clock::now(); // Start the clock  ****UNCOMMENT THIS LINE
-    //int visitCount = 0;           ****UNCOMMENT THIS LINE
-
+    auto startTime = std::chrono::steady_clock::now(); // Start the clock  ****UNCOMMENT THIS LINE
+    int visitCount = 0;           /UNCOMMENT THIS LINE
 
     /* ========================================================
         See the dfs() function in graph.cpp for reference
@@ -30,6 +28,19 @@ std::vector<std::pair<std::string, double>> runRandomWalk(
 
      * ======================================================== */
 
-     return {};       // REMOVE THIS LINE
-    //return visited; // Replace your current return with this   ****UNCOMMENT THIS LINE
+    // Implementation: random walk logic
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    std::string current = startNode;
+    visited.emplace_back(current, 0.0);
+    for (int i = 1; i < maxNodesToVisit; ++i) {
+        const auto& neighbors = g.getNeighbors(current);
+        if (neighbors.empty()) break;
+        int idx = std::rand() % neighbors.size();
+        current = neighbors[idx].first;
+        auto now = std::chrono::steady_clock::now();
+        double elapsed = std::chrono::duration<double, std::milli>(now - startTime).count();
+        visited.emplace_back(current, elapsed);
+    }
+
+    return visited; 
 }
