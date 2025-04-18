@@ -16,7 +16,8 @@ bin/
 # ========================
 # Database files and personal text lists
 data/youtube_data.db
-data/*.txt  # includes playlist_video_ids.txt, etc.
+data/playlist_video_ids.txt
+data/inserted_video_relations.txt
 
 # ========================
 # Environment and debug logs
@@ -45,3 +46,10 @@ archive/*
 Thumbs.db
 .vscode/
 .idea/
+
+# ========================
+# Ignore traversal output logs during development
+data/astar_logs/*.csv
+data/dfs_logs/*.csv
+data/dijkstra_logs/*.csv
+data/randomwalk_logs/*.csv
