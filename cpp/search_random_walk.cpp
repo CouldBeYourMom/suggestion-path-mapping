@@ -11,7 +11,7 @@ std::vector<std::pair<std::string, double>> runRandomWalk(
     // Keep these following 3 lines here
     std::vector<std::pair<std::string, double>> visited; // visited : vector of (video_id, time_since_start_in_ms)
     auto startTime = std::chrono::steady_clock::now(); // Start the clock  ****UNCOMMENT THIS LINE
-    int visitCount = 0;           /UNCOMMENT THIS LINE
+    int visitCount = 0;     
 
     /* ========================================================
         See the dfs() function in graph.cpp for reference
