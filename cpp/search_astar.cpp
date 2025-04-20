@@ -12,6 +12,10 @@ public:
 double calculateHeuristic(const Graph& g, std::string& node, const std::string& weightType) {
     // Heuristic estimate is just extracting edge weight.
     std::vector<std::pair<std::string, int>> neighbors = g.getNeighbors(node);
+    // If no neighbors, return heuristic of 0.
+    if (neighbors.size() == 0) {
+        return 0.0;
+    }
     int minWeight = neighbors[0].second;
     for (auto neighbor : neighbors) {
         if (neighbor.second < minWeight) {
@@ -59,6 +63,7 @@ std::vector<std::pair<std::string, double>> runAStar(
     // Begin iterating through data
     for (int i = 0; i < maxNodesToVisit; i++) {
         if (unprocessed.size() == 0) {
+            std::cout << "Ran out of nodes to process." << std::endl;
             break;
         }
 
@@ -89,7 +94,7 @@ std::vector<std::pair<std::string, double>> runAStar(
             std::string neighbor = neighborWeight.first;
             int weight = neighborWeight.second;
 
-            if (distances.find(neighbor) == distances.end() || fValues.find(neighbor) == fValues.end()) {
+            if (parents.find(neighbor) == parents.end() || distances.find(neighbor) == distances.end() || fValues.find(neighbor) == fValues.end()) {
                 // Neighbor does not yet have an assigned distance or f value
                 parents[neighbor] = curr;
                 distances[neighbor] = distances[curr] + weight;
