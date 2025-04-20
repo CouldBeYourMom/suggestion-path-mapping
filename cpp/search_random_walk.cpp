@@ -13,7 +13,7 @@ std::vector<std::pair<std::string, double>> runRandomWalk(
 ) {
     // Keep these following 3 lines here
     std::vector<std::pair<std::string, double>> visited; // visited : vector of (video_id, time_since_start_in_ms)
-    auto startTime = std::chrono::steady_clock::now(); 
+    auto startTime = std::chrono::steady_clock::now(); // Start the clock
     (void)startTime;
 
     // Random walk logic with visitedPairs to prevent revisits
@@ -23,23 +23,42 @@ std::vector<std::pair<std::string, double>> runRandomWalk(
 
     // Track edges already taken to prevent revisits
     std::unordered_set<std::pair<std::string, std::string>, pair_hash> visitedPairs;
+    std::vector<std::string> backtrackStack;           // keep the path for backtracking
+    backtrackStack.push_back(current);
 
-    for (int i = 1; i < maxNodesToVisit; ++i) {
+    while (static_cast<int>(visited.size()) < maxNodesToVisit) {
         const auto& neighbors = g.getNeighbors(current);
-        if (neighbors.empty()) break;
         std::vector<std::pair<std::string, int>> candidates;
         for (const auto& p : neighbors) {
             if (!visitedPairs.count({current, p.first})) {
                 candidates.push_back(p);
             }
         }
-        if (candidates.empty()) break;
+
+        if (candidates.empty()) {
+            // backtrack until we find a node with an unused edge
+            bool found = false;
+            while (!backtrackStack.empty() && !found) {
+                backtrackStack.pop_back(); 
+                if (backtrackStack.empty()) break;
+                current = backtrackStack.back();
+                const auto& nbrs = g.getNeighbors(current);
+                for (const auto& p : nbrs) {
+                    if (!visitedPairs.count({current, p.first})) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (!found) break; // nowhere else to go
+            continue;          // re‑evaluate
+        }
 
         int idx = std::rand() % candidates.size();
         std::string next = candidates[idx].first;
-
         visitedPairs.insert({current, next});
         current = next;
+        backtrackStack.push_back(current);
 
         auto now = std::chrono::steady_clock::now();
         double elapsed = std::chrono::duration<double, std::milli>(now - startTime).count();
