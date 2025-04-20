@@ -52,6 +52,9 @@ std::vector<std::pair<std::string, double>> runAStar(
     fValues[startNode] = 0;
     distances[startNode] = 0;
     parents[startNode] = "No parent";
+    // Insert start node into priority queue as pair of node and f value (0 for the start)
+    std::pair<std::string, double> startPair{startNode, 0.0};
+    unprocessed.push(startPair);
 
     // Begin iterating through data
     for (int i = 0; i < maxNodesToVisit; i++) {
