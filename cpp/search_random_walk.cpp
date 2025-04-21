@@ -52,31 +52,6 @@ std::vector<std::pair<std::string, double>> runRandomWalk(
             continue;
         }
 
-        /*_________________________________________
-        IF YOU WANT TO IMPLEMENT WEIGHTED WALKS JUST REPLACE THE
-        THE TWO LINES ABOVE WITH THE FOLLOWING:
-        
-        // Compute total weight
-        double totalWeight = 0.0;
-        for (const auto& [neighbor, weight] : candidates) {
-            totalWeight += weight;
-        }
-
-        // Pick a weighted random neighbor
-        double r = static_cast<double>(std::rand()) / RAND_MAX * totalWeight;
-        double cumulative = 0.0;
-        std::string next;
-
-        for (const auto& [neighbor, weight] : candidates) {
-            cumulative += weight;
-            if (r <= cumulative) {
-                next = neighbor;
-                break;
-            }
-        }
-            
-        **THIS STILL PRODUCES A RANDOM WALK_____________ */
-
         // ----- weighted‑choice implementation -----
         double totalWeight = 0.0;
         for (const auto& [neighbor, weight] : candidates) {
