@@ -2,6 +2,7 @@
 #include <chrono>
 #include <iostream>
 
+// Comparison class for use in priority queue.
 class Compare {
 public:
     bool operator() (const std::pair<std::string, double> node1, const std::pair<std::string, double> node2){
@@ -9,13 +10,26 @@ public:
     }
 };
 
+// Heuristic function for calculating priorities.
 double calculateHeuristic(const Graph& g, std::string& node, const std::string& weightType) {
-    // Heuristic estimate is just extracting edge weight.
+    // Heuristic estimate will extract edge weight.
     std::vector<std::pair<std::string, int>> neighbors = g.getNeighbors(node);
     // If no neighbors, return heuristic of 0.
     if (neighbors.size() == 0) {
         return 0.0;
     }
+    // Check weight type to determine search behavior
+    if (weightType == "flag_count" || weightType == "flag") {
+        // Simulating a child searching for highly flagged inappropriate videos.
+        int maxFlags = neighbors[0].second;
+        for (auto neighbor : neighbors) {
+            if (neighbor.second > maxFlags) {
+                maxFlags = neighbor.second;
+            }
+        }
+        return maxFlags;
+    }
+    // For other weight types, find minimum edge to avoid overestimates.
     int minWeight = neighbors[0].second;
     for (auto neighbor : neighbors) {
         if (neighbor.second < minWeight) {
@@ -25,14 +39,15 @@ double calculateHeuristic(const Graph& g, std::string& node, const std::string& 
     return minWeight;
 }
 
-std::vector<std::pair<std::string, double>> runAStar(
+// Returns vector of tuples: video, parent, and time
+std::vector<std::tuple<std::string, std::string, double>>  runAStar(
     const Graph& g,
     const std::string& startNode,
     int maxNodesToVisit,
     const std::string& weightType
 ) {
     // List of things to return and start time.
-    std::vector<std::pair<std::string, double>> visited; // Returning this vector: visited : vector of (video_id, time_since_start_in_ms)
+    std::vector<std::tuple<std::string, std::string, double>> visited; // Returning this vector: visited : vector of (video_id, time_since_start_in_ms)
     auto startTime = std::chrono::steady_clock::now(); // Start the clock
     int visitCount = 0;
 
@@ -55,7 +70,7 @@ std::vector<std::pair<std::string, double>> runAStar(
     // Insert the start node
     fValues[startNode] = 0;
     distances[startNode] = 0;
-    parents[startNode] = "No parent";
+    parents[startNode] = "";
     // Insert start node into priority queue as pair of node and f value (0 for the start)
     std::pair<std::string, double> startPair{startNode, 0.0};
     unprocessed.push(startPair);
@@ -83,7 +98,11 @@ std::vector<std::pair<std::string, double>> runAStar(
         // Retrieve the time stamp and time elapsed
         auto now = std::chrono::steady_clock::now();
         double elapsed = std::chrono::duration<double, std::milli>(now - startTime).count();
-        visited.emplace_back(curr, elapsed);
+        if (parents.find(curr) == parents.end()) {
+            visited.emplace_back(curr, "", elapsed);
+        } else {
+            visited.emplace_back(curr, parents[curr], elapsed);
+        }
         auto neighbors = g.getNeighbors(curr);
         if (neighbors.size() == 0) {
             continue;

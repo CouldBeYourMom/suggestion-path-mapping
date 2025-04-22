@@ -13,7 +13,7 @@
 // Kevin Yu: Implementing A* search algorithm
 
 // Returns a list of (video ID, elapsed time timestamp)
-std::vector<std::pair<std::string, double>> runAStar(
+std::vector<std::tuple<std::string, std::string, double>>  runAStar(
     const Graph& g,
     const std::string& startNode,
     int maxNodesToVisit,
