@@ -18,22 +18,12 @@ double calculateHeuristic(const Graph& g, std::string& node, const std::string& 
     if (neighbors.size() == 0) {
         return 0.0;
     }
-    // Check weight type to determine search behavior
-    if (weightType == "flag_count" || weightType == "flag") {
-        // Simulating a child searching for highly flagged inappropriate videos.
-        int maxFlags = neighbors[0].second;
-        for (auto neighbor : neighbors) {
-            if (neighbor.second > maxFlags) {
-                maxFlags = neighbor.second;
-            }
-        }
-        return maxFlags;
-    }
-    // For other weight types, find minimum edge to avoid overestimates.
-    int minWeight = neighbors[0].second;
+    // Find minimum transformed edge weight.
+    // Multiplication by 1.0 to convert to double.
+    double minWeight = 1.0 * neighbors[0].second;
     for (auto neighbor : neighbors) {
         if (neighbor.second < minWeight) {
-            minWeight = neighbor.second;
+            minWeight = 1.0 * neighbor.second;
         }
     }
     return minWeight;
