@@ -1,6 +1,6 @@
 Promise.all([
-  fetch('graph.json').then(res => res.json()),
-  fetch('search.json').then(res => res.json())
+  fetch(`graph.json?v=${Date.now()}`).then(res => res.json()),
+  fetch(`search.json?v=${Date.now()}`).then(res => res.json())
 ])
 .then(([fullGraph, traversal]) => {
   // Track which nodes and edges were visited/traversed
@@ -23,6 +23,8 @@ Promise.all([
 
   const Graph = ForceGraph3D()(document.getElementById('3d-graph'))
     .graphData(fullGraph)
+    .cooldownTicks(200)
+    .cooldownTime(20000) // optional, can delete this line
     .backgroundColor('#111')
 
     // Node color based on group + visited status
@@ -62,7 +64,7 @@ Promise.all([
     .linkColor(link => link.traversed ? 'rgba(231, 94, 208, 1)' : 'rgba(252, 252, 252, .5)')
     .linkWidth(link => link.traversed ? 4 : 0.5)
     .linkOpacity(0.2)
-    .linkCurvature(link => link.traversed ? 0.1 : 0)
+    .linkCurvature(link => link.traversed ? 0.0 : 0) // update the double here to add curvature to the traversed path
 
     // Traversed arrow styling
     .linkDirectionalArrowLength(link => link.traversed ? 10 : 0)
