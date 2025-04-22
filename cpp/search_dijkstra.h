@@ -7,7 +7,7 @@
 #include <utility>
 
 // Returns a list of (video ID, elapsed time timestamp)
-std::vector<std::pair<std::string, double>> runDijkstra(
+std::vector<std::tuple<std::string, std::string, double>> runDijkstra(
     const Graph& g,
     const std::string& startNode,
     int maxNodesToVisit,

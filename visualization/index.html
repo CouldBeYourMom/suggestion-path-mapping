@@ -23,8 +23,16 @@
   <body>
     <div id="3d-graph"></div>
 
-    <!-- Load 3D Force Graph -->
-    <script src="https://unpkg.com/3d-force-graph"></script>
-    <script src="script.js"></script>
-  </body>
+  <!-- Load ForceGraph + Three.js -->
+  <script src="https://unpkg.com/three"></script>
+  <script src="https://unpkg.com/3d-force-graph"></script>
+  
+  <!-- Center Node Button -->
+  <button id="center-start-btn" style="position: absolute; top: 10px; left: 10px; z-index: 1;">
+    🎯 Center on Start Node
+  </button>
+
+  <!-- Visualization Script -->
+  <script src="script.js"></script>
+</body>
 </html>

@@ -23,26 +23,27 @@ Each video is evaluated using a dictionary of inappropriate words/phrases curate
 - 🔧 **Technologies Used**:  
   Python · SQLite · C++ · VSCode · Git · JavaScript + Three.js
 
-## 🧪 Algorithms (In Progress)
+## 🧠 Traversal Algorithms (Complete & Visualized)
 
-We're designing traversal algorithms to simulate how a viewer might progress from safe to unsafe content, in order to **compare their behavior** and **evaluate risk** within the graph structure:
+We've designed traversal algorithms to simulate how a viewer might progress from safe to unsafe content, in order to **compare their behavior** and **evaluate risk** within the graph structure:
 
-- 🔍 **A\***: Finds the shortest "path to corruption" — from a known-safe video to one flagged for inappropriate content.
-- 🧭 **Dijkstra’s**: Maps broader clusters of video suggestions with increasing risk.
-- 🎲 **Random Walks**: Mimics a naive user (like a child) clicking randomly through recommendations.
+- 🔍 **A\***: Simulates the shortest weighted path to a flagged node.
+- 🧭 **Dijkstra’s**: Captures efficient exploratory paths through high-volume content.
+- 🎲 **Random Walks**: Mimics a naive user clicking randomly — often showing unintended risk chains.
+- 🧵 **DFS**: Used as the base traversal and first fully visualized path overlay.
 
 We’re also designing the structure so that future semantic analysis (via LLMs or classifiers) can be plugged in easily.
 
 ## 📂 Project Structure
 
 ```plaintext
-data/           ← SQLite DB, flag dictionary, playlist logs
+data/           ← SQLite DB, flag dictionary
 scripts/        ← Python scripts for collection & flagging
 cpp/            ← Graph + algorithm implementations (C++)
 visualization/  ← 3D rendering using ForceGraph3D + JSON export
 backups/        ← Daily zipped backups of the DB
 archive/        ← Deprecated or legacy scripts
-docs/           ← Dev notes and strategy logs
+docs/           ← Dev notes, algorithm summaries, and HowToRun instructions
 ```
 
 ## 🔍 Key Features
@@ -77,13 +78,18 @@ $ cp .env.example .env      # Add your YouTube API key
 $ python scripts/run_all.py # Populate the database (see dev_notes for options)
 ```
 
-To compile and run the C++ traversal system:
+### 🚦 Full Run Instructions
+
+To compile and run the graph, launch the interactive CLI, and view results in the 3D visualization:
 
 ```bash
-$ ./scripts/compile_graph.sh    # Or follow the instructions in cpp/README.md
-$ ./bin/graph.exe export        # Generate visualization-ready JSON
-$ python -m http.server 5500    # Preview 3D graph in browser
+$ python compile_graph.py      # Compiles C++ files, runs the program, and starts the server (auto opens browser)
 ```
+✅ Supports both PowerShell and MSYS2 UCRT64 terminals (unknown support for MinGW)
+
+📘 Full run instructions and terminal compatibility table available in:
+> [`docs/HowToRun.md`](docs/HowToRun.md)
+
 
 ## 🙌🏻 Acknowledgements
 
