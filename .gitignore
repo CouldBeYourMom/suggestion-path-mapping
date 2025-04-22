@@ -25,12 +25,14 @@ data/inserted_video_relations.txt
 *.log
 *.tmp
 *.bak
+*.bat
 run_log.txt
 compile_log.txt
 
 # ========================
 # Visualization output
 data/graph.json
+visualization/*.json
 visualization/graph.json
 
 # ========================
