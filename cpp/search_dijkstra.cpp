@@ -23,7 +23,7 @@
  */
 
 
-std::vector<std::pair<std::string, double>> runDijkstra(
+std::vector<std::tuple<std::string, std::string, double>> runDijkstra(
     const Graph& g,
     const std::string& startNode,
     int maxNodesToVisit,
