@@ -31,7 +31,7 @@ std::vector<std::pair<std::string, double>> runDijkstra(
 ) {
 
     // Create a vector of visited (video_id, time_since_start_in_ms) and start the clock -- Provided by Carrie
-    std::vector<std::pair<std::string, double>> visited;
+    std::vector<std::tuple<std::string, std::string, double>> visited;
     auto startTime = std::chrono::steady_clock::now();
     int visitCount = 0;
 
@@ -71,7 +71,7 @@ std::vector<std::pair<std::string, double>> runDijkstra(
         // Timestamp this visit and record the node -- Provided by Carrie
         auto now = std::chrono::steady_clock::now();
         double elapsed = std::chrono::duration<double, std::milli>(now - startTime).count();
-        visited.emplace_back(currentNode, elapsed);
+        visited.emplace_back(currentNode, parentNode, elapsed);
         ++visitCount;
 
         // Look at all neighbors of the current node
