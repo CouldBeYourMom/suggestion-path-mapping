@@ -102,9 +102,9 @@ Sections below reflect major functional areas with short, dated updates to track
 - ✅ DFS traversal visualized with directional edges
 - ✅ Start node marked; visited nodes styled
 - ✅ Nodes sized and colored by group (Safe → Extreme)
-- ❌ Only DFS currently outputs the full traversal edge map for visualization
-- ✅ All infrastructure supports overlaying other traversals in future iterations
-
+- ✅ All search types export correctly in a unified format
+- ✅ DFS, A*, Dijkstra, and Random Walk all visualize correctly via exportTraversalToJSON()
+- ✅ Graph uses directional links and cache-busted fetches to ensure freshness
 
 ---
 
@@ -114,6 +114,9 @@ Sections below reflect major functional areas with short, dated updates to track
 - *Apr 20*: Styling finalized, node hover info added
 - *Apr 21*: Prototype locked and documented for DFS
 - *Apr 22*: Visualization documented as DFS-only with future expansion noted
+- *Apr 23*: Added cache-busting to all `fetch()` calls to resolve browser refresh issues
+- *Apr 23*: Applied cooldown tuning for faster initial graph layout and better responsiveness
+- *Apr 23*: Finalized support for all traversals to export `(node, parent, timestamp)` for directional edge rendering
 
 ---
 
@@ -138,13 +141,14 @@ Sections below reflect major functional areas with short, dated updates to track
 - *Apr 14*: Added CSV export from `exportResults()`
 - *Apr 14–15*: Organized all traversal output by folder and timestamp
 - *Apr 21*: Finalized graph cleanup, removed legacy logic, tagged visualization status
+
 ---
 
 ## 🚀 Next Steps
 
 **Short-Term**:
-- [ ] Add overlay support for A*, Dijkstra, and Random Walk paths
-- [ ] Extend traversal export to support `(node, parent)` for all algorithms (like DFS)
+- [x] Added overlay support for A*, Dijkstra, and Random Walk paths
+- [x] Extended traversal export to support `(node, parent)` for all algorithms (DFS, A*, Dijkstra, RW)
 - [ ] Add controls to toggle visibility of unvisited nodes or untraversed edges
 - [ ] Highlight overlapping paths and cycles in a future visualization pass
 
@@ -152,7 +156,6 @@ Sections below reflect major functional areas with short, dated updates to track
 - [ ] Allow interactive comparison of multiple search outputs
 - [ ] Add support for weighted path visualizations (e.g., path thickness = comment count)
 - [ ] Save/share visualization snapshots as static images or embeddable views
-
 
 ---
 

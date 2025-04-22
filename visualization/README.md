@@ -2,8 +2,8 @@
 
 This folder contains the **interactive 3D prototype** of the YouTube suggestion path graph, powered by `3d-force-graph` and built from data exported by the C++ backend.
 
-⚠️ **Current Status:** Prototype  
-🔍 **Supported Search:** Standard DFS traversal only  
+⚠️ **Current Status:** DFS Prototype with Extended Search Support  
+🔍 **Supported Search:** DFS, Dijkstra, A*, and Random Walk (DFS fully visualized; others export-ready) 
 🎯 **Purpose:** Visually demonstrate search path reconstruction and node relationships
 
 ---
@@ -51,6 +51,8 @@ Make sure you're using the DFS search before launching this prototype.
 - ✅ Hover reveals video title
 - ✅ Traversed path is highlighted with thicker lines and directional arrows
 - ✅ Start node marked in blue
+- ✅ Graph auto-refreshes with updated data (cache-busting added)
+- ✅ Optimized performance for large datasets (cooldown and layout tuning)
 
 ⚠️ **Flag counts** are not currently visible, but group-based visual encoding is fully active.
 
@@ -58,7 +60,7 @@ Make sure you're using the DFS search before launching this prototype.
 
 ## 🔮 Future Expansion
 
-- Enable visualization for A*, Dijkstra, and Random Walk
+- Enable visualization for A*, Dijkstra, and Random Walk ✅ (export-ready)
 - Add controls to isolate or compare specific traversals
 - Display live stat counts on hover or via legend
 - Add filtering by group, stat threshold, or timestamp

@@ -47,11 +47,11 @@ This step will flag the videos and generate outputs based on the test dataset.
 ### ⚙️ 4. Compile & Run the C++ Graph
 
 ```bash
-./bin/main.exe                  # Prompts user to select stat + traversal type
+bin/graph.exe  # Prompts user to select stat + traversal type
 ```
 
 ✅ DFS, A*, Dijkstra, and Random Walk are fully implemented.  
-🔍 **Only DFS currently feeds into the visualization pipeline.**
+🔍 All four traversals (DFS, Dijkstra, A, Random Walk) now export correctly. DFS is fully visualized; others are export-ready.*
 
 ---
 
@@ -86,3 +86,12 @@ This script will:
 3. Launch a local server on port 5500 to visualize the DFS traversal
 
 ✅ `compile_graph.py` is located in the root directory.
+
+---
+### 🖥️ Terminal Compatibility
+
+`compile_graph.py` has been tested and works in:
+
+- ✅ PowerShell
+- ✅ MSYS2 UCRT64 terminal
+- ⚠️ Not currently compatible with MinGW64 (graph.exe may not launch properly)

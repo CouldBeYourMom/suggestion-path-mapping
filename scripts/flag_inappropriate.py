@@ -7,6 +7,7 @@ with open("../data/inappropriate_words.json", "r") as f:
     inappropriate_words = json.load(f)
 
 def count_inappropriate_words(text):
+    """Returns the number of inappropriate words found in the text."""
     if not text:
         return 0
     text = text.lower()
@@ -21,57 +22,65 @@ def count_inappropriate_words(text):
             total_flags += len(matches)
     return total_flags
 
-# Connect to DB
+# Connect to database
 conn = sqlite3.connect("../data/youtube_data.db")
 cursor = conn.cursor()
 
-# Prepare data store
-flag_data = {}
+flagged_videos = 0
+flagged_comments = 0
 
-# 🧠 Step 1: Age restriction keyword check
-cursor.execute("SELECT id, description FROM videos")
+# ✅ Flag videos with age restriction warnings
+cursor.execute("SELECT id, description FROM videos WHERE flagged = 0")
 for video_id, description in cursor.fetchall():
-    age_flags = 0
     if description and any(keyword in description.lower() for keyword in ["under the age of 18", "parental permission", "18+"]):
-        age_flags = 1
-        print(f"🚨 Age restriction warning detected in {video_id}")
-    flag_data[video_id] = {"age_flags": age_flags, "desc_flags": 0, "transcript_flags": 0, "comment_flags": 0}
+        cursor.execute("UPDATE videos SET flagged = 1 WHERE id = ?", (video_id,))
+        flagged_videos += 1
+        print(f"🚨 Flagged video {video_id} for age restriction warning.")
 
-# 🧠 Step 2: Description and transcript flagging
+# ✅ Flag videos based on transcript and description
 cursor.execute("SELECT id, description, transcript FROM videos")
 for video_id, description, transcript in cursor.fetchall():
     desc_flags = count_inappropriate_words(description)
     trans_flags = count_inappropriate_words(transcript)
+    total_flags = desc_flags + trans_flags
 
-    if video_id not in flag_data:
-        flag_data[video_id] = {"age_flags": 0, "desc_flags": 0, "transcript_flags": 0, "comment_flags": 0}
+    if total_flags > 0:
+        cursor.execute("UPDATE videos SET flagged = ? WHERE id = ?", (total_flags, video_id))
+        flagged_videos += 1
+        print(f"🚨 Flagged video {video_id} with {total_flags} content violations.")
 
-    flag_data[video_id]["desc_flags"] = desc_flags
-    flag_data[video_id]["transcript_flags"] = trans_flags
-
-# 🧠 Step 3: Comment flagging (summed per video)
-cursor.execute("SELECT video_id, comment FROM comments")
-for video_id, comment in cursor.fetchall():
+# ✅ Flag inappropriate comments
+cursor.execute("SELECT id, video_id, comment FROM comments WHERE flagged = 0")
+for comment_id, video_id, comment in cursor.fetchall():
     comment_flags = count_inappropriate_words(comment)
+    if comment_flags > 0:
+        cursor.execute("UPDATE comments SET flagged = ? WHERE id = ?", (comment_flags, comment_id))
+        flagged_comments += 1
+        print(f"🚨 Flagged comment {comment_id} on video {video_id} with {comment_flags} issues.")
 
-    if video_id not in flag_data:
-        flag_data[video_id] = {"age_flags": 0, "desc_flags": 0, "transcript_flags": 0, "comment_flags": 0}
-
-    flag_data[video_id]["comment_flags"] += comment_flags
-
-# 💥 Step 4: Rebuild video_flag_counts
+# ✅ Recalculate and update video_flag_counts (replaces triggers)
+print("📊 Recalculating total flags for each video...")
 cursor.execute("DELETE FROM video_flag_counts")
-
-for video_id, flags in flag_data.items():
-    total = flags["age_flags"] + flags["desc_flags"] + flags["transcript_flags"] + flags["comment_flags"]
-    cursor.execute("""
-        INSERT INTO video_flag_counts (video_id, age_flags, desc_flags, transcript_flags, comment_flags, total_flags)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """, (video_id, flags["age_flags"], flags["desc_flags"], flags["transcript_flags"], flags["comment_flags"], total))
-    if total > 0:
-        print(f"✅ {video_id} flagged — Total: {total} (Age: {flags['age_flags']}, Desc: {flags['desc_flags']}, Trans: {flags['transcript_flags']}, Comments: {flags['comment_flags']})")
+cursor.execute("""
+    INSERT INTO video_flag_counts (video_id, flag_count)
+    SELECT
+        v.id,
+        COALESCE(v.flagged, 0) + COALESCE(SUM(c.flagged), 0)
+    FROM videos v
+    LEFT JOIN comments c ON v.id = c.video_id
+    GROUP BY v.id
+""")
+print("✅ video_flag_counts table updated with combined flags.")
 
 conn.commit()
+
+# ✅ Final counts
+cursor.execute("SELECT COUNT(*) FROM videos WHERE flagged > 0")
+final_videos_flagged = cursor.fetchone()[0]
+
+cursor.execute("SELECT COUNT(*) FROM comments WHERE flagged > 0")
+final_comments_flagged = cursor.fetchone()[0]
+
 conn.close()
 
-print("🎉 Done! video_flag_counts has been updated.")
+print(f"🎉 Flagging complete! {final_videos_flagged} videos and {final_comments_flagged} comments flagged.")
