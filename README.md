@@ -36,13 +36,13 @@ We’re also designing the structure so that future semantic analysis (via LLMs 
 ## 📂 Project Structure
 
 ```plaintext
-data/           ← SQLite DB, flag dictionary, playlist logs
+data/           ← SQLite DB, flag dictionary
 scripts/        ← Python scripts for collection & flagging
 cpp/            ← Graph + algorithm implementations (C++)
 visualization/  ← 3D rendering using ForceGraph3D + JSON export
 backups/        ← Daily zipped backups of the DB
 archive/        ← Deprecated or legacy scripts
-docs/           ← Dev notes and strategy logs
+docs/           ← Dev notes, algorithm summaries, and HowToRun instructions
 ```
 
 ## 🔍 Key Features
@@ -77,12 +77,13 @@ $ cp .env.example .env      # Add your YouTube API key
 $ python scripts/run_all.py # Populate the database (see dev_notes for options)
 ```
 
-To compile and run the C++ traversal system:
+### 🚦 Full Run Instructions
+
+To compile and run the graph, launch the interactive CLI, and view results in the 3D visualization:
 
 ```bash
-$ ./scripts/compile_graph.sh    # Or follow the instructions in cpp/README.md
-$ ./bin/graph.exe export        # Generate visualization-ready JSON
-$ python -m http.server 5500    # Preview 3D graph in browser
+$ python compile_graph.py      # Compiles C++ files and launches graph.exe
+$ python -m http.server 5500   # Launches visualization server (or use Live Server)
 ```
 
 ## 🙌🏻 Acknowledgements

@@ -58,10 +58,11 @@ Sections below reflect major functional areas with short, dated updates to track
 
 ## 🧠 Graph Structure & Algorithms
 
-**Core Logic**  
-- Implemented in C++ using adjacency list
-- Each node = video, each edge = parent→suggested relationship
-- Designed for multiple traversal strategies
+**Core Logic**:
+- Graph implemented in C++ using adjacency list
+- Nodes = video IDs, Edges = parent → suggested links
+- Traversals: DFS, A*, Dijkstra, Random Walk
+- Edge weights computed via `veraVerto()` transformation for fair traversal scaling
 
 **Traversals**:
 - 🔍 A*: Simulates most direct route to high-risk content
@@ -79,33 +80,49 @@ Sections below reflect major functional areas with short, dated updates to track
   - Added `visitedPairs` (unordered_set with custom `pair_hash`) to track `(child, parent)` visits. This ensures we allow revisits to nodes through different paths (as needed for YouTube structure), while preventing infinite loops from repeated edge traversals.
   - Updated all `search_*.cpp` stubs with final integration format for team members. Each includes `visitedPairs` scaffolding, elapsed time tracking, and support for `maxNodesToVisit` (optional).
   - Added `userOptions()` and `runSelectedSearch()` for cleaner CLI flow — now supports stat selection and dispatches to the correct traversal with logging built-in.
+- *Apr 15*: A*, Dijkstra, and Random Walk implementations completed and tested by team members
+- *Apr 16*: Added `veraVerto()` for normalized edge weighting
+- *Apr 21*: All teammates added individual algorithm summaries in `docs/`
+- *Apr 22*: ✅ Fully integrated all traversal outputs with shared export format and graph logic
 
 ---
 
 ## 🌐 Visualization
 
-**Purpose**: Show node relationships and flag counts using an interactive force-directed graph
+**Purpose**: Visually represent search paths through YouTube’s recommendation network using 3D force-directed rendering.
 
 **Stack**:
-- `graph.json` → exported from C++
-- `3d-force-graph` → JavaScript/Three.js wrapper
-- Python's http.server or VSCode Live Server
+- Data: `graph.json` (all nodes/edges) and `search.json` (DFS traversal)
+- Frontend: `3d-force-graph` and Three.js via CDN
+- Tools: Python's `http.server` or VSCode Live Server
+
+---
+
+**Current Status:**
+- ✅ DFS traversal visualized with directional edges
+- ✅ Start node marked; visited nodes styled
+- ✅ Nodes sized and colored by group (Safe → Extreme)
+- ❌ Only DFS currently outputs the full traversal edge map for visualization
+- ✅ All infrastructure supports overlaying other traversals in future iterations
+
 
 ---
 
 **🗓️ Updates**
-- *Apr 9*: Created `visualization/` folder and fully implemented 3D rendering of YouTube graph
-- *Apr 9*: Added real-time resizing support and custom styling
-- *Apr 9*: Confirmed browser compatibility and deployed local server using Python
+- *Apr 9*: Initial rendering pipeline created
+- *Apr 14*: Refined export format to track (node, parent)
+- *Apr 20*: Styling finalized, node hover info added
+- *Apr 21*: Prototype locked and documented for DFS
+- *Apr 22*: Visualization documented as DFS-only with future expansion noted
 
 ---
 
 ## 🧪 Testing & Structure
 
 **Strategy**:
-- Isolate each major step (collection, flagging, export, viz) for modular testing
-- Added command-line flag to export JSON independently
-- Stored playlist IDs and added notes to track growth over time
+- Modularity: collection, flagging, export, and viz can be run independently
+- CLI prompts streamline testing by stat and algorithm
+- Each traversal logs CSV output to `data/<searchType>_logs/`
 
 ---
 
@@ -118,22 +135,24 @@ Sections below reflect major functional areas with short, dated updates to track
   - Total time elapsed recorded at the bottom
   - Filename format: `[searchType]_[timestamp]_[stat].csv`
 - *Apr 14*: Created per-search output folders under `data/` (e.g., `dfs_logs/`, `astar_logs/`) and added `.gitkeep` to preserve them in Git.
-- *Apr 14*: Committed 4 example DFS exports for evaluation and instructor review.
+- *Apr 14*: Added CSV export from `exportResults()`
+- *Apr 14–15*: Organized all traversal output by folder and timestamp
+- *Apr 21*: Finalized graph cleanup, removed legacy logic, tagged visualization status
 ---
 
 ## 🚀 Next Steps
 
 **Short-Term**:
-- Add optional cleanup or log rotation strategy for `data/*_logs/` folders (e.g., keep last 10 files)
-- Verify A*, Dijkstra, and Random Walk output correctness once team members push their working implementations
-- Add sample script or Makefile target to compile and run with `main.cpp` + selected search file
-- Allow traversal results to be exported for overlay in visualization
-- Add filters to hide/show nodes by group (Safe, Risky, Extreme)
+- [ ] Add overlay support for A*, Dijkstra, and Random Walk paths
+- [ ] Extend traversal export to support `(node, parent)` for all algorithms (like DFS)
+- [ ] Add controls to toggle visibility of unvisited nodes or untraversed edges
+- [ ] Highlight overlapping paths and cycles in a future visualization pass
 
 **Mid-Term**:
-- Support GitHub Pages deployment or Netlify for demo
-- Support hover-based traversal path preview (with reset button)
-- Add snapshot mode (save .png of current state)
+- [ ] Allow interactive comparison of multiple search outputs
+- [ ] Add support for weighted path visualizations (e.g., path thickness = comment count)
+- [ ] Save/share visualization snapshots as static images or embeddable views
+
 
 ---
 
