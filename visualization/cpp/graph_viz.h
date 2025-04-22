@@ -2,7 +2,7 @@
 #define GRAPH_VIZ_H
 
 #include <string>
-#include "../cpp/graph.h"
+#include "graph.h"
 #include "external/json.hpp"
 using json = nlohmann::json;
 

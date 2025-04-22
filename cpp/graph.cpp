@@ -101,9 +101,13 @@ void Graph::runSelectedSearch(const std::string& searchType, const std::string& 
         exportResults(result, "astar", stat);
         exportAndPrepareForViewer(*this, result, "astar", stat, startNode);
     } else if (searchType == "D") {
-        result = runDijkstra(*this, startNode, maxNodes, stat);
-        exportResults(result, "dijkstra", stat);
-        exportAndPrepareForViewer(*this, result, "dijkstra", stat, startNode);
+        auto dijkstraResults = runDijkstra(*this, startNode, maxNodes, stat);
+        std::vector<std::pair<std::string, double>> flatResults;
+        for (const auto& [node, parent, time] : dijkstraResults) {
+            flatResults.emplace_back(node, time);
+        }
+        exportResults(flatResults, "dijkstra", stat);
+        exportAndPrepareForViewer(*this, dijkstraResults, "dijkstra", stat, startNode);
     } else if (searchType == "R") {
         result = runRandomWalk(*this, startNode, maxNodes, stat);
         exportResults(result, "randomwalk", stat);
