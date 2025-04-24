@@ -1,14 +1,28 @@
-# YouTube Data API access
+# =======================================
+# YouTube-Graph-Analysis: Python Packages
+# ---------------------------------------
+# This requirements.txt contains all dependencies used by
+# the Python backend scripts to:
+# - Connect to the YouTube API
+# - Download transcripts and metadata
+# - Manage environment variables and config
+# - Provide progress visualization
+# =======================================
+
+# 🛰️ YouTube Data API (search, metadata, etc.)
 google-api-python-client==2.120.0
 google-auth==2.29.0
 google-auth-oauthlib==1.2.0
 
-# Transcript retrieval
+# 📝 Transcript access via YouTube
 youtube-transcript-api==0.6.2
 
-# HTTP requests & progress bars
+# 🔁 HTTP requests & progress bar visuals
 requests==2.31.0
 tqdm==4.66.2
 
-# Environment variable handling
+# 🔐 Load API keys and config from .env file
 python-dotenv==1.0.1
+
+# 📊 (Optional) CSV manipulation and dataset inspection
+pandas==2.2.2

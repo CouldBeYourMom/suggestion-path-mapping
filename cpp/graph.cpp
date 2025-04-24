@@ -82,14 +82,29 @@ void Graph::runSelectedSearch(const std::string& searchType, const std::string& 
         result = dfs(startNode);
         exportResults(result, "dfs", stat);
     } else if (searchType == "A") {
-        result = runAStar(*this, startNode, maxNodes, stat);
-        exportResults(result, "astar", stat);
+        auto astarResults = runAStar(*this, startNode, maxNodes, stat);
+        std::vector<std::pair<std::string, double>> flatResults;
+        for (const auto& [node, parent, time] : astarResults) {
+            flatResults.emplace_back(node, time);
+        }
+        exportResults(flatResults, "astar", stat);
+        exportAndPrepareForViewer(*this, astarResults, "astar", stat, startNode);
     } else if (searchType == "D") {
-        result = runDijkstra(*this, startNode, maxNodes, stat);
-        exportResults(result, "dijkstra", stat);
+        auto dijkstraResults = runDijkstra(*this, startNode, maxNodes, stat);
+        std::vector<std::pair<std::string, double>> flatResults;
+        for (const auto& [node, parent, time] : dijkstraResults) {
+            flatResults.emplace_back(node, time);
+        }
+        exportResults(flatResults, "dijkstra", stat);
+        exportAndPrepareForViewer(*this, dijkstraResults, "dijkstra", stat, startNode);
     } else if (searchType == "R") {
-        result = runRandomWalk(*this, startNode, maxNodes, stat);
-        exportResults(result, "randomwalk", stat);
+        auto randomwalkResults = runRandomWalk(*this, startNode, maxNodes, stat);
+        std::vector<std::pair<std::string, double>> flatResults;
+        for (const auto& [node, parent, time] : randomwalkResults) {
+            flatResults.emplace_back(node, time);
+        }
+        exportResults(flatResults, "randomwalk", stat);
+        exportAndPrepareForViewer(*this, randomwalkResults, "randomwalk", stat, startNode);
     }
 }
 
@@ -553,6 +568,21 @@ int Graph::getCommentCount(const std::string& videoId, sqlite3* db) const {
         sqlite3_finalize(stmt);
     }
     return comments;
+}
+
+/*_________________________
+     TRAVERSAL Helper 
+        Functions
+___________________________*/
+/* 
+ Retrieves a list of adjacent nodes and edge weights for the given node ID
+ - Used by external search algorithms (e.g., A*, Dijkstra, RandomWalk)
+ - Returns an empty vector if node ID is not found in the graph
+*/
+const std::vector<std::pair<std::string, int>>& Graph::getNeighbors(const std::string& nodeId) const {
+    static const std::vector<std::pair<std::string, int>> empty; // Fallback
+    auto it = adjList.find(nodeId);
+    return (it != adjList.end()) ? it->second : empty;
 }
 
 /*_____________________

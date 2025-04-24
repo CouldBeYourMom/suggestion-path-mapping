@@ -20,7 +20,8 @@ public:
     Graph() = default;
     ~Graph(); // Cleanup adjacency list and flagCounts
     void userOptions(); // Prompts user for algorithm and stat type, builds graph, and runs selected search
-    
+    const std::vector<std::pair<std::string, int>>& getNeighbors(const std::string& nodeId) const; // Returns a const reference to the neighbors and edge weights of a given node
+
 private:
     /*-------------
         STRUCTURES
