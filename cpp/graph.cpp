@@ -97,9 +97,13 @@ void Graph::runSelectedSearch(const std::string& searchType, const std::string& 
         exportResults(result, "bfs", stat);
         exportAndPrepareForViewer(*this, result, "bfs", stat, startNode);
     } else if (searchType == "A") {
-        result = runAStar(*this, startNode, maxNodes, stat);
-        exportResults(result, "astar", stat);
-        exportAndPrepareForViewer(*this, result, "astar", stat, startNode);
+        auto astarResults = runAStar(*this, startNode, maxNodes, stat);
+        std::vector<std::pair<std::string, double>> flatResults;
+        for (const auto& [node, parent, time] : astarResults) {
+            flatResults.emplace_back(node, time);
+        }
+        exportResults(flatResults, "astar", stat);
+        exportAndPrepareForViewer(*this, astarResults, "astar", stat, startNode);
     } else if (searchType == "D") {
         auto dijkstraResults = runDijkstra(*this, startNode, maxNodes, stat);
         std::vector<std::pair<std::string, double>> flatResults;
@@ -109,9 +113,13 @@ void Graph::runSelectedSearch(const std::string& searchType, const std::string& 
         exportResults(flatResults, "dijkstra", stat);
         exportAndPrepareForViewer(*this, dijkstraResults, "dijkstra", stat, startNode);
     } else if (searchType == "R") {
-        result = runRandomWalk(*this, startNode, maxNodes, stat);
-        exportResults(result, "randomwalk", stat);
-        exportAndPrepareForViewer(*this, result, "randomwalk", stat, startNode);
+        auto randomwalkResults = runRandomWalk(*this, startNode, maxNodes, stat);
+        std::vector<std::pair<std::string, double>> flatResults;
+        for (const auto& [node, parent, time] : randomwalkResults) {
+            flatResults.emplace_back(node, time);
+        }
+        exportResults(flatResults, "randomwalk", stat);
+        exportAndPrepareForViewer(*this, randomwalkResults, "randomwalk", stat, startNode);
     }
 }
 

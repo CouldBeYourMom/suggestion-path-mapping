@@ -34,17 +34,7 @@ Before compiling, ensure the correct filename is specified in **two places** ins
 
 ---
 
-### 🧠 3. Populate the Graph from the DB
-
-```bash
-python scripts/run_all.py
-```
-
-This step will flag the videos and generate outputs based on the test dataset.
-
----
-
-### ⚙️ 4. Compile & Run the C++ Graph
+### ⚙️ 3. Compile & Run the C++ Graph
 
 ```bash
 ./bin/main.exe                  # Prompts user to select stat + traversal type
@@ -55,7 +45,7 @@ This step will flag the videos and generate outputs based on the test dataset.
 
 ---
 
-### 🌐 5. Launch the 3D Visualization (DFS Only)
+### 🌐 4. Launch the 3D Visualization (DFS Only)
 
 ```bash
 cd visualization/
@@ -72,7 +62,7 @@ Open your browser and go to:
 
 ---
 
-### 🐍 6. Optional: Use Python Script to Compile and Launch (Cross-Platform)
+### 🐍 5. Optional: Use Python Script to Compile and Launch (Cross-Platform)
 
 Just run this:
 
