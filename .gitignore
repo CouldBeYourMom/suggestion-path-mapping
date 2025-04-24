@@ -54,4 +54,8 @@ Thumbs.db
 data/astar_logs/*.csv
 data/dfs_logs/*.csv
 data/dijkstra_logs/*.csv
+<<<<<<< HEAD
 data/randomwalk_logs/*.csv
+=======
+data/randomwalk_logs/*.csv
+>>>>>>> 5cb29d1b9d54399f0e2ab1e776f44b088ca18b05

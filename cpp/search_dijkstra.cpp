@@ -1,3 +1,4 @@
+#include "search_dijkstra.h"
 #include <chrono>
 #include <iostream>
 #include <unordered_set>
