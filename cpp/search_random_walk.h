@@ -7,7 +7,7 @@
 #include <utility>
 
 // Returns a list of (video ID, elapsed time timestamp)
-std::vector<std::pair<std::string, double>> runRandomWalk(
+std::vector<std::tuple<std::string, std::string, double>> runRandomWalk(
     const Graph& g,
     const std::string& startNode,
     int maxNodesToVisit,
