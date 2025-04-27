@@ -178,7 +178,7 @@ void exportTraversalToJSON(
 /*--------------------------------------------------
   Export + Copy Traversal File for Visualization
 --------------------------------------------------*/
-void exportAndPrepareForViewer(Graph& graph,
+void exportAndPrepareForViewer(const Graph& graph,
     const std::vector<std::pair<std::string, double>>& path,
     const std::string& searchType,
     const std::string& stat,
@@ -188,7 +188,7 @@ void exportAndPrepareForViewer(Graph& graph,
     copyTraversalToSearchJSON(searchType, stat);
 }
 
-void exportAndPrepareForViewer(Graph& graph,
+void exportAndPrepareForViewer(const Graph& graph,
     const std::vector<std::tuple<std::string, std::string, double>>& path,
     const std::string& searchType,
     const std::string& stat,
