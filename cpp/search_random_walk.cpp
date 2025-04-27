@@ -1,6 +1,10 @@
 #include "search_random_walk.h"
+#include "graph.h"
+#include <cstdlib>
+#include <ctime>
 #include <chrono>
 #include <iostream>
+#include <unordered_set>
 
 std::vector<std::tuple<std::string, std::string, double>> runRandomWalk(
     const Graph& g,
@@ -14,7 +18,7 @@ std::vector<std::tuple<std::string, std::string, double>> runRandomWalk(
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     std::string current = startNode;
-    visited.emplace_back(current, 0.0);
+    visited.emplace_back(current, current, 0.0);
 
     // Track edges already taken to prevent revisits
     std::unordered_set<std::pair<std::string, std::string>, pair_hash> visitedPairs;
@@ -78,6 +82,5 @@ std::vector<std::tuple<std::string, std::string, double>> runRandomWalk(
         visited.emplace_back(current, parent, elapsed);
     }
 
-     return {};       // REMOVE THIS LINE
-    //return visited; // Replace your current return with this   ****UNCOMMENT THIS LINE
+    return visited;
 }

@@ -13,7 +13,7 @@ public:
 // Heuristic function for calculating priorities.
 double calculateHeuristic(const Graph& g, std::string& node, const std::string& weightType) {
     // Heuristic estimate will extract edge weight.
-    std::vector<std::pair<std::string, int>> neighbors = g.getNeighbors(node);
+    std::vector<std::pair<std::string, double>> neighbors = g.getNeighbors(node);
     // If no neighbors, return heuristic of 0.
     if (neighbors.size() == 0) {
         return 0.0;
@@ -99,9 +99,9 @@ std::vector<std::tuple<std::string, std::string, double>>  runAStar(
         }
 
         // Now go through neighbors and add neighbors into priority queue.
-        for (std::pair<std::string, int> neighborWeight : neighbors) {
+        for (std::pair<std::string, double> neighborWeight : neighbors) {
             std::string neighbor = neighborWeight.first;
-            int weight = neighborWeight.second;
+            double weight = neighborWeight.second;
 
             if (parents.find(neighbor) == parents.end() || distances.find(neighbor) == distances.end() || fValues.find(neighbor) == fValues.end()) {
                 // Neighbor does not yet have an assigned distance or f value

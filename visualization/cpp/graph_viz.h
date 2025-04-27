@@ -23,13 +23,13 @@ void exportTraversalToJSON(const Graph& graph,
     const std::string& startNode);
 
 // Wrapper to export + copy to viewer file
-void exportAndPrepareForViewer(Graph& graph,
+void exportAndPrepareForViewer(const Graph& graph,
     const std::vector<std::pair<std::string, double>>& path,
     const std::string& searchType,
     const std::string& stat,
     const std::string& startNode);
 
-void exportAndPrepareForViewer(Graph& graph,
+void exportAndPrepareForViewer(const Graph& graph,
     const std::vector<std::tuple<std::string, std::string, double>>& path,
     const std::string& searchType,
     const std::string& stat,
