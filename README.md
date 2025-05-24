@@ -34,6 +34,12 @@ We've designed traversal algorithms to simulate how a viewer might progress from
 
 We’re also designing the structure so that future semantic analysis (via LLMs or classifiers) can be plugged in easily.
 
+## 📄 Final Report & Dataset
+
+- 🧾 [`Report_152 - FINAL.pdf`](docs/Report_152 - FINAL.pdf) — Full project documentation and findings  
+- 🗃️ [youtube_data.db](data/youtube_data.db) — Final dataset with video metadata, links, flags, and stats  
+- 📑 [README_data.md](data/README_data.md) — Table schema and ethical usage disclaimer  
+
 ## 📂 Project Structure
 
 ```plaintext
@@ -102,3 +108,20 @@ $ python compile_graph.py      # Compiles C++ files, runs the program, and start
   - Adam Schwartz (@schwartza-afs)  
   - Kevin Yu (@kevinyu0)  
 - Visualization powered by [3d-force-graph](https://github.com/vasturiano/3d-force-graph)
+
+---
+
+🔒 This repository is now frozen and read-only for archival purposes.  
+All collaborators have been removed; all contributions are preserved and documented.  
+Please fork the project if you'd like to use it as a foundation.
+
+See [`docs/team_acknowledgments.md`](docs/team_acknowledgments.md) for detailed contribution credits.
+
+---
+
+## 🪪 License
+
+This project is licensed under the [GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).  
+You are free to use and modify it for academic or non-commercial use, provided you maintain this license and include attribution.
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)

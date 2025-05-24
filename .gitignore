@@ -1,61 +1,66 @@
-# ========================
-# Python cache and temp
+# === PYTHON ===
 __pycache__/
-*.py[cod]
-*.sqlite3-journal
-
-# ========================
-# Compiled C++ files and build artifacts
-*.o
-*.out
-*.exe
-*.a
-*.lib
-bin/
-
-# ========================
-# Database files and personal text lists
-data/youtube_data.db
-data/playlist_video_ids.txt
-data/inserted_video_relations.txt
-
-# ========================
-# Environment and debug logs
+*.pyc
+*.pyo
+*.pyd
+*.env
+*.venv
 .env
+.env.*
+
+# === C++ Build Files ===
+*.exe
+*.out
+*.o
+*.obj
 *.log
 *.tmp
-*.bak
-*.bat
-run_log.txt
-compile_log.txt
 
-# ========================
-# Visualization output
-data/graph.json
-visualization/*.json
-visualization/graph.json
-
-# ========================
-# Keep backups/archive folder structure
-backups/*
-!backups/.gitkeep
-archive/*
-!archive/.gitkeep
-
-# ========================
-# OS and IDE-specific stuff
-.DS_Store
-Thumbs.db
+# === Visual Studio Code ===
 .vscode/
 .idea/
 
-# ========================
-# Ignore traversal output logs during development
-data/astar_logs/*.csv
-data/dfs_logs/*.csv
-data/dijkstra_logs/*.csv
-<<<<<<< HEAD
-data/randomwalk_logs/*.csv
-=======
-data/randomwalk_logs/*.csv
->>>>>>> 5cb29d1b9d54399f0e2ab1e776f44b088ca18b05
+# === Node/Web Server Output ===
+node_modules/
+*.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# === Visualization Cache ===
+/visualization/search.json
+/visualization/*.json.backup
+/visualization/*.tmp
+/visualization/graph_live.png
+/visualization/*.cache
+
+# === DB Backups and Snapshots ===
+/backups/
+*.zip
+*.bak
+
+# === Compiled or Temporary DB Files ===
+# (Allow main SQLite DB used in analysis)
+*.db
+!data/youtube_data.db
+!data/synthetic_youtube_data.db
+
+# === CSV Traversal Output ===
+# Allow search logs (.csv) in structured folders
+!data/dfs_logs/*.csv
+!data/astar_logs/*.csv
+!data/dijkstra_logs/*.csv
+!data/randomwalk_logs/*.csv
+!data/bfs_logs/*.csv
+
+# Preserve .gitkeep files so folders stay tracked
+!.gitkeep
+
+# === Misc Files ===
+# Compiler script logs
+compile_log.txt
+run_log.txt
+
+# === Archive Files ===
+# DO NOT ignore archive/*.py or *.cpp
+!archive/*.*

@@ -5,6 +5,13 @@ Sections below reflect major functional areas with short, dated updates to track
 
 ---
 
+🧊 **Repo Status:** Finalized for archival and portfolio use.  
+All collaborators have been removed, and `main` is now a protected branch.  
+For questions, contact [carrieruble@ufl.edu](mailto:carrieruble@ufl.edu)
+
+---
+
+
 ## 📚 Table of Contents
 - [📦 Data Collection Pipeline](#-data-collection-pipeline)
 - [🔍 Flagging & Dictionary Strategy](#-flagging--dictionary-strategy)
@@ -164,3 +171,22 @@ Sections below reflect major functional areas with short, dated updates to track
 - Playlist-based discovery is fast and avoids automation detection
 - Visualization helped identify high-flag clusters and bridge nodes
 - Many flagged videos are multi-linked and could serve as pivot points for comparison
+
+---
+
+## 📁 Repo Organization Overview
+
+- `data/youtube_data.db`: Final SQLite dataset (scrubbed, flagged, export-ready)
+- `data/README_data.md`: Table schema and ethics/disclaimer documentation
+- `docs/SPM_final_report.pdf`: Full project proposal and formal report
+- `visualization/`: Graph JSON exports, 3D renderer
+- `archive/`: Development-stage scripts and manually gathered seed files
+- `compile_graph.py`: Unified compile/run/test pipeline
+
+---
+
+## 🏁 Final Commit Note
+
+This repo is now frozen as a showcase artifact.  
+All traversal logic, data exports, and documentation are complete and verified.  
+Future improvements or explorations will be forked and built elsewhere.
